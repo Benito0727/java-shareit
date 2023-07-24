@@ -7,7 +7,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
@@ -22,7 +21,7 @@ public class UserController {
     private final UserServiceImpl service;
 
     @PostMapping
-    public User addUser(@RequestBody @NotNull @Valid User user) {
+    public User addUser(@RequestBody @Valid User user) {
         return service.addUser(user);
     }
 

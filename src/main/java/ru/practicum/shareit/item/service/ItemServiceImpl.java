@@ -76,9 +76,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public Set<Item> getItemSet(long userId) {
-        return repository.getItemList(userId).stream()
-                .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        try {
+            if (userRepository.getUserById(userId) != null) {
+                return repository.getItemList(userId).stream()
+                        .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+            } else {
+                throw new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId));
+            }
+        } catch (NotFoundException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     public Set<Item> getItemsByText(long userId, String text) {

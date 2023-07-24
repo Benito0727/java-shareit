@@ -8,7 +8,6 @@ import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.InMemoryUserRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.validation.ConstraintViolation;
@@ -23,11 +22,7 @@ import static ru.practicum.shareit.unit.TestUnit.*;
 @SpringBootTest
 public class UserTest {
 
-    UserRepository repository;
-
-    UserService service;
-
-    UserController controller;
+    private UserController controller;
 
     static Validator validator;
 
@@ -39,9 +34,9 @@ public class UserTest {
 
     @BeforeEach
     public void setController() {
-        repository = new InMemoryUserRepository();
-        service = new UserServiceImpl(repository);
-        controller = new UserController((UserServiceImpl) service);
+        UserRepository repository = new InMemoryUserRepository();
+        UserServiceImpl service = new UserServiceImpl(repository);
+        controller = new UserController(service);
     }
 
     @Test

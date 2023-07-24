@@ -54,6 +54,7 @@ public class InMemoryItemRepository implements ItemRepository {
             if (item.getUserId() == userId) {
                 items.remove(itemId);
                 log.info("Владелец удалил вещь с ID: {}", itemId);
+                return;
             } else {
                 log.warn("Только владелец может удалить вещь");
                 throw new ValidationException("Только владелец может удалить вещь");

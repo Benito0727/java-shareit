@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 
+import javax.validation.Valid;
 import java.util.Set;
 
 /**
@@ -17,7 +18,7 @@ import java.util.Set;
 public class ItemController {
 
     @Autowired
-    private ItemServiceImpl service;
+    private final ItemServiceImpl service;
 
     @GetMapping
     public Set<Item> getItemSet(@RequestHeader("X-Sharer-User-Id") long userId) {
@@ -32,7 +33,7 @@ public class ItemController {
 
     @PostMapping
     public Item addItem(@RequestHeader("X-Sharer-User-Id") long userId,
-                           @RequestBody Item item) {
+                           @RequestBody @Valid Item item) {
         return service.createItem(userId, item);
     }
 
