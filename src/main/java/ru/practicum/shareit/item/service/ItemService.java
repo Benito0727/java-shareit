@@ -22,7 +22,7 @@ public class ItemService {
     @Autowired
     private final ItemRepository repository;
 
-    public Item createItem(long userId , Item item) throws NotFoundException, ValidationException {
+    public Item createItem(long userId, Item item) throws NotFoundException, ValidationException {
         if (userRepository.getUserById(userId) != null) {
             if (item.getName() == null ||
                     item.getName().isBlank() ||

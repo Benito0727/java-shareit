@@ -72,7 +72,7 @@ public class ItemController {
                                @RequestParam String text) {
         try {
             return service.getItemsByText(userId, text);
-        }catch (NotFoundException exception) {
+        } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
     }

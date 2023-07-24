@@ -58,7 +58,8 @@ public class InMemoryItemRepository implements ItemRepository {
                 log.warn("Только владелец может удалить вещь");
                 throw new ValidationException("Только владелец может удалить вещь");
             }
-        } throw new NotFoundException(String.format("Не нашли вещь с ID: %s", itemId));
+        }
+        throw new NotFoundException(String.format("Не нашли вещь с ID: %s", itemId));
     }
 
     @Override
@@ -105,7 +106,7 @@ public class InMemoryItemRepository implements ItemRepository {
 
     private int substringSearch(String text, String searchingText) {
         int i = 0;
-        for (;;){
+        for (;;) {
             if (i > text.length() - searchingText.length()) {
                 return -1;
             }
