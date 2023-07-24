@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.model;
 
 import lombok.Data;
 
@@ -10,9 +10,9 @@ import javax.validation.constraints.NotBlank;
  */
 
 @Data
-public class User {
+public class User implements Comparable<User> {
 
-    private long id;
+    private Long id;
 
     @NotBlank
     private String name;
@@ -21,4 +21,8 @@ public class User {
     @Email
     private String email;
 
+    @Override
+    public int compareTo(User o) {
+        return (int) (this.id - o.id);
+    }
 }
