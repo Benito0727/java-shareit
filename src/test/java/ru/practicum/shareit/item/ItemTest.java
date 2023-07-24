@@ -123,7 +123,7 @@ public class ItemTest {
         Item item2 = getItem();
         Item item3 = getItem();
 
-        controller.addItem(1 , item1);
+        controller.addItem(1, item1);
         controller.addItem(1, item2);
         controller.addItem(2, item3);
 
