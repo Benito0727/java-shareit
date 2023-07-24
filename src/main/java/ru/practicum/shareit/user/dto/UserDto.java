@@ -1,16 +1,18 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Data
-public class UserDto {
+@Getter
+@Setter
+public class UserDto extends User {
 
     @NotNull
-    private long id;
+    private Long id;
 
     @NotBlank
     private String name;
