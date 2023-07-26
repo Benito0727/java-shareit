@@ -2,22 +2,22 @@ package ru.practicum.shareit.item.service;
 
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.Set;
 
 public interface ItemService {
 
-    Item createItem(long userId, Item item) throws NotFoundException, ValidationException;
+    ItemDto createItem(long userId, ItemDto itemDto) throws NotFoundException, ValidationException;
 
-    Item updateItem(long userId, long itemId, Item item) throws NotFoundException, ValidationException;
+    ItemDto updateItem(long userId, long itemId, ItemDto itemDto) throws NotFoundException, ValidationException;
 
-    Item getItemById(long userId, long itemId) throws NotFoundException;
+    ItemDto getItemById(long userId, long itemId) throws NotFoundException;
 
     void removeItemById(long userId, long itemId) throws NotFoundException, ValidationException;
 
-    Set<Item> getItemSet(long userId);
+    Set<ItemDto> getItemSet(long userId);
 
-    Set<Item> getItemsByText(long userId, String text) throws NotFoundException;
+    Set<ItemDto> getItemsByText(long userId, String text) throws NotFoundException;
 
 }

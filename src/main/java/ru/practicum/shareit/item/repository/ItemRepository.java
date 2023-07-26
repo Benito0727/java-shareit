@@ -5,7 +5,6 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
-import java.util.Set;
 
 public interface ItemRepository {
 
@@ -19,5 +18,5 @@ public interface ItemRepository {
 
     List<Item> getItemList(long userId);
 
-    Set<Item> getItemByText(String text);
+    List<Item> getItemByText(String text);
 }

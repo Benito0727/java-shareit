@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
@@ -19,29 +18,21 @@ public class InMemoryItemRepository implements ItemRepository {
     private long currentItemId = 0;
 
     @Override
-    public Item addItem(long userId, Item item) throws ValidationException {
-        if (userId > 0) {
-            if (item.getId() == null) item.setId(++currentItemId);
+    public Item addItem(long userId, Item item) {
+            item.setId(++currentItemId);
             log.info("Вещи под названием {}, присвоен ID: {}", item.getName(), item.getId());
             item.setUserId(userId);
             log.info("Вещь с ID: {} принадлежит пользователю {}", item.getId(), userId);
             items.put(item.getId(), item);
             return item;
-        } else {
-            throw new ValidationException("У вещи должен быть хозяин");
-        }
     }
 
     @Override
     public Item getItemById(long userId, long itemId) throws NotFoundException {
         Item item = items.get(itemId);
         if (item != null) {
-            if (item.getUserId() == userId) {
-                log.info("Вернули владельцу {}, полную вещь {}", userId, itemId);
-                return item;
-            }
-            log.info("Вещь {}, запросил не ее владелец, вернули общую информацию", item.getName());
-            return new ItemDto(item);
+            log.info("Вернули вещь {}", itemId);
+            return item;
         } else {
             throw new NotFoundException("Неверный ID  предмета");
         }
@@ -87,13 +78,15 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public List<Item> getItemList(long userId) {
-        return items.values().stream().filter(i -> i.getUserId() == userId).collect(Collectors.toList());
+        return items.values().stream()
+                .filter(i -> i.getUserId() == userId)
+                .collect(Collectors.toList());
     }
 
-    public Set<Item> getItemByText(String text) {
-        if (text == null || text.isEmpty() || text.isBlank()) return Set.of();
+    public List<Item> getItemByText(String text) {
+        if (text == null || text.isEmpty() || text.isBlank()) return List.of();
         List<Item> itemList = new ArrayList<>(items.values());
-        Set<Item> foundItems = new TreeSet<>((o1, o2) -> (int) (o1.getId() - o2.getId()));
+        List<Item> foundItems = new ArrayList<>();
 
         for (Item item : itemList) {
             if (item.getAvailable()) {
@@ -101,7 +94,6 @@ public class InMemoryItemRepository implements ItemRepository {
                 if (substringSearch(item.getDescription().toLowerCase(), text.toLowerCase()) == 1) foundItems.add(item);
             }
         }
-
         return foundItems;
     }
 

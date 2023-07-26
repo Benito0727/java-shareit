@@ -1,19 +1,19 @@
 package ru.practicum.shareit.unit;
 
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 public class TestUnit {
 
-    public static User getUser() {
-        User user = new User();
+    public static UserDto getUser() {
+        UserDto user = new UserDto();
         user.setName("user");
         user.setEmail("user@user.com");
         return user;
     }
 
-    public static Item getItem() {
-        Item item = new Item();
+    public static ItemDto getItem() {
+        ItemDto item = new ItemDto();
         item.setName("item");
         item.setDescription("item description");
         item.setAvailable(true);

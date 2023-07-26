@@ -2,27 +2,18 @@ package ru.practicum.shareit.user.model;
 
 import lombok.Data;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-
-/**
- * TODO Sprint add-controllers.
- */
-
 @Data
-public class User implements Comparable<User> {
+public class User {
 
-    private Long id;
+    private long id;
 
-    @NotBlank
     private String name;
 
-    @NotBlank
-    @Email
     private String email;
 
-    @Override
-    public int compareTo(User o) {
-        return (int) (this.id - o.id);
+    public User(Long id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
     }
 }

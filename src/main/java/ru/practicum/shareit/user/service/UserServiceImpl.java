@@ -6,11 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserEntityDtoMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service("UserService")
@@ -21,25 +22,27 @@ public class UserServiceImpl implements UserService {
     private final UserRepository storage;
 
 
-    public User addUser(User user) {
+    public UserDto addUser(UserDto userDto) {
         try {
-            return storage.addUser(user);
+            User user = UserEntityDtoMapper.getEntityFromDto(userDto);
+            return UserEntityDtoMapper.getDtoFromEntity(storage.addUser(user));
         } catch (ValidationException | ConflictException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    public User updateUser(long id, User user) {
+    public UserDto updateUser(long id, UserDto userDto) {
         try {
-            return storage.updateUser(id, user.getName(), user.getEmail());
+            User user = UserEntityDtoMapper.getEntityFromDto(userDto);
+            return UserEntityDtoMapper.getDtoFromEntity(storage.updateUser(id, user));
         } catch (ConflictException | NotFoundException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    public User getUserById(long id) {
+    public UserDto getUserById(long id) {
         try {
-            return storage.getUserById(id);
+            return UserEntityDtoMapper.getDtoFromEntity(storage.getUserById(id));
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
@@ -53,9 +56,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public Set<User> getAllUsers() {
+    public Set<UserDto> getAllUsers() {
         if (storage.getUserList() != null) {
-            return storage.getUserList().stream()
+            List<User> users = storage.getUserList();
+            Set<UserDto> userDtoSet = new TreeSet<>((o1, o2) -> (int) (o1.getId() - o2.getId()));
+            for (User user : users) {
+                userDtoSet.add(UserEntityDtoMapper.getDtoFromEntity(user));
+            }
+            return userDtoSet.stream()
                     .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         } else {

@@ -10,11 +10,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.controller.ItemController;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.repository.InMemoryItemRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserEntityDtoMapper;
 import ru.practicum.shareit.user.repository.InMemoryUserRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -53,15 +54,16 @@ public class ItemTest {
 
     @Test
     public void shouldAddItemOrThrow() throws ValidationException, ConflictException {
-        User user = getUser();
-        userRepository.addUser(user);
+        UserDto user = getUser();
+        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user));
 
-        Item item = getItem();
+        ItemDto item = getItem();
+        item.setId(1);
         controller.addItem(1, item);
 
         assertEquals(item, controller.getItemById(1, 1));
         item.setName("");
-        Set<ConstraintViolation<Item>> violations = validator.validate(item);
+        Set<ConstraintViolation<ItemDto>> violations = validator.validate(item);
         System.out.println(violations);
         assertFalse(violations.isEmpty());
 
@@ -75,13 +77,16 @@ public class ItemTest {
 
     @Test
     public void shouldGetItemByIdOrThrow() throws ValidationException, ConflictException {
-        User user = getUser();
-        userRepository.addUser(user);
-        User user2 = getUser();
+        UserDto user = getUser();
+        user.setId(1);
+        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user));
+        UserDto user2 = getUser();
+        user2.setId(2);
         user2.setEmail("otheEmail@user.com");
-        userRepository.addUser(user2);
+        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user2));
 
-        Item item = getItem();
+        ItemDto item = getItem();
+        item.setId(1);
         controller.addItem(1, item);
 
         assertEquals(item, controller.getItemById(1, 1));
@@ -92,15 +97,19 @@ public class ItemTest {
 
     @Test
     public void shouldGetAllItemsByUserId() throws ValidationException, ConflictException {
-        User user1 = getUser();
-        User user2 = getUser();
+        UserDto user1 = getUser();
+        user1.setId(1);
+        UserDto user2 = getUser();
+        user2.setId(2);
         user2.setEmail("updateUser@user.com");
 
-        userRepository.addUser(user1);
-        userRepository.addUser(user2);
+        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user1));
+        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user2));
 
-        Item item1 = getItem();
-        Item item2 = getItem();
+        ItemDto item1 = getItem();
+        item1.setId(1);
+        ItemDto item2 = getItem();
+        item2.setId(2);
 
         controller.addItem(1, item1);
         controller.addItem(2, item2);
@@ -112,16 +121,21 @@ public class ItemTest {
 
     @Test
     public void shouldGetAvailableItemsBySearch() throws ValidationException, ConflictException {
-        User user1 = getUser();
-        User user2 = getUser();
+        UserDto user1 = getUser();
+        user1.setId(1);
+        UserDto user2 = getUser();
+        user2.setId(2);
         user2.setEmail("otherUser@user.com");
 
-        userRepository.addUser(user1);
-        userRepository.addUser(user2);
+        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user1));
+        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user2));
 
-        Item item1 = getItem();
-        Item item2 = getItem();
-        Item item3 = getItem();
+        ItemDto item1 = getItem();
+        item1.setId(1);
+        ItemDto item2 = getItem();
+        item2.setId(2);
+        ItemDto item3 = getItem();
+        item3.setId(3);
 
         controller.addItem(1, item1);
         controller.addItem(1, item2);
@@ -141,10 +155,12 @@ public class ItemTest {
 
     @Test
     public void shouldRemoveItemOrGetTrows() throws ValidationException, ConflictException {
-        User user = getUser();
-        userRepository.addUser(user);
+        UserDto user = getUser();
+        user.setId(1);
+        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user));
 
-        Item item = getItem();
+        ItemDto item = getItem();
+        item.setId(1);
         controller.addItem(1, item);
 
         assertEquals(item, controller.getItemById(1, 1));

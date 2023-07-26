@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.ItemEntityDtoMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -22,42 +24,36 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private final ItemRepository repository;
 
-    public Item createItem(long userId, Item item) {
+    public ItemDto createItem(long userId, ItemDto itemDto) {
         try {
-            if (userRepository.getUserById(userId) != null) {
-                if (item.getName() == null ||
-                        item.getName().isBlank() ||
-                        item.getName().isEmpty()) throw new ValidationException("Имя вещи должно быть заполнено");
-                if (item.getDescription() == null) throw new ValidationException("Описание вещи должно быть заполнено");
-                if (item.getAvailable() == null) throw new ValidationException("Статус вещи должен быть заполнен");
-                return repository.addItem(userId, item);
-            } else {
-                throw new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId));
-            }
+            userRepository.getUserById(userId);
+            Item item = ItemEntityDtoMapper.getItemFromItemDto(itemDto);
+            if (item.getName() == null ||
+                item.getName().isBlank() ||
+                item.getName().isEmpty()) throw new ValidationException("Имя вещи должно быть заполнено");
+            if (item.getDescription() == null) throw new ValidationException("Описание вещи должно быть заполнено");
+            if (item.getAvailable() == null) throw new ValidationException("Статус вещи должен быть заполнен");
+            Item createdItem = repository.addItem(userId, item);
+            return ItemEntityDtoMapper.getItemDtoFromItem(createdItem);
+        } catch (ValidationException | NotFoundException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
+        try {
+            userRepository.getUserById(userId);
+            Item item = ItemEntityDtoMapper.getItemFromItemDto(itemDto);
+            return ItemEntityDtoMapper.getItemDtoFromItem(repository.updateItem(userId, itemId, item));
         } catch (NotFoundException | ValidationException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    public Item updateItem(long userId, long itemId, Item item) {
+    public ItemDto getItemById(long userId, long itemId) {
         try {
-            if (userRepository.getUserById(userId) != null) {
-                return repository.updateItem(userId, itemId, item);
-            } else {
-                throw new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId));
-            }
-        } catch (NotFoundException | ValidationException exception) {
-            throw new RuntimeException(exception);
-        }
-    }
-
-    public Item getItemById(long userId, long itemId) {
-        try {
-            if (userRepository.getUserById(userId) != null) {
-                return repository.getItemById(userId, itemId);
-            } else {
-                throw new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId));
-            }
+            userRepository.getUserById(userId);
+            return ItemEntityDtoMapper.getItemDtoFromItem(repository.getItemById(userId, itemId));
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
@@ -65,37 +61,38 @@ public class ItemServiceImpl implements ItemService {
 
     public void removeItemById(long userId, long itemId) {
         try {
-            if (userRepository.getUserById(userId) != null) {
-                repository.removeItem(userId, itemId);
-            } else {
-                throw new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId));
-            }
+            userRepository.getUserById(userId);
+            repository.removeItem(userId, itemId);
         } catch (NotFoundException | ValidationException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    public Set<Item> getItemSet(long userId) {
+    public Set<ItemDto> getItemSet(long userId) {
         try {
-            if (userRepository.getUserById(userId) != null) {
-                return repository.getItemList(userId).stream()
-                        .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
-                        .collect(Collectors.toCollection(LinkedHashSet::new));
-            } else {
-                throw new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId));
+            userRepository.getUserById(userId);
+            List<Item> items = repository.getItemList(userId);
+            List<ItemDto> itemsDto = new ArrayList<>();
+            for (Item item : items) {
+                itemsDto.add(ItemEntityDtoMapper.getItemDtoFromItem(item));
             }
+            return itemsDto.stream()
+                    .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    public Set<Item> getItemsByText(long userId, String text) {
+    public Set<ItemDto> getItemsByText(long userId, String text) {
         try {
-            if (userRepository.getUserById(userId) != null) {
-                return repository.getItemByText(text);
-            } else {
-                throw new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId));
+            userRepository.getUserById(userId);
+            List<Item> items = repository.getItemByText(text);
+            Set<ItemDto> itemDtoSet = new TreeSet<>((o1, o2) -> (int) (o1.getId() - o2.getId()));
+            for (Item item : items) {
+                itemDtoSet.add(ItemEntityDtoMapper.getItemDtoFromItem(item));
             }
+            return itemDtoSet;
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }

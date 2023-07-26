@@ -15,7 +15,7 @@ public interface UserRepository {
 
     List<User> getUserList();
 
-    User updateUser(long userId, String name, String email) throws NotFoundException, ConflictException;
+    User updateUser(long userId, User user) throws NotFoundException, ConflictException;
 
     void deleteUserById(long id) throws NotFoundException;
 }

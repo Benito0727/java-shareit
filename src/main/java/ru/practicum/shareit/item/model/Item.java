@@ -5,11 +5,6 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-
-/**
- * TODO Sprint add-controllers.
- */
-
 @Data
 public class Item {
 
@@ -25,4 +20,14 @@ public class Item {
     private Boolean available;
 
     private Long userId;
+
+    public Item(Long id,
+                String name,
+                String description,
+                Boolean available) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
+    }
 }

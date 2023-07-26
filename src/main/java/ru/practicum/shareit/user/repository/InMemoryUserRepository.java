@@ -14,7 +14,7 @@ public class InMemoryUserRepository implements UserRepository {
 
     private final Map<Long, User> users = new HashMap<>();
 
-    private long userId = 1;
+    private long currentUserId = 0;
 
     @Override
     public User addUser(User user) throws ConflictException {
@@ -24,7 +24,7 @@ public class InMemoryUserRepository implements UserRepository {
                 throw new ConflictException("Email занят");
             }
         }
-        if (user.getId() == null) user.setId(userId++);
+        user.setId(++currentUserId);
         log.info("Пользователю по имени {} присвоен id: {}", user.getName(), user.getId());
         users.put(user.getId(), user);
         log.info("Пользователь с ID: {}, добавлен в хранилище", user.getId());
@@ -47,27 +47,26 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public User updateUser(long id, String name, String email) throws ConflictException, NotFoundException {
-        User user = getUserOrThrow(id);
+    public User updateUser(long id, User user) throws ConflictException, NotFoundException {
+        User userToUpdate = getUserOrThrow(id);
 
-        if (name != null) {
-            user.setName(name);
+        if (user.getName() != null) {
+            userToUpdate.setName(user.getName());
             log.info("Пользователь с ID: {} сменил имя", id);
         }
 
-        if (email != null && !user.getEmail().equals(email)) {
+        if (user.getEmail() != null && !userToUpdate.getEmail().equals(user.getEmail())) {
             if (!users.isEmpty()) {
                 if (users.values().stream()
-                    .anyMatch(u -> u.getEmail().equals(email))) {
+                    .anyMatch(u -> u.getEmail().equals(user.getEmail()))) {
                     throw new ConflictException("Email занят");
                     }
             }
-            user.setEmail(email);
+            userToUpdate.setEmail(user.getEmail());
             log.info("Пользователь с ID: {} сменил email", id);
         }
-
-        users.put(id, user);
-        return user;
+        users.put(id, userToUpdate);
+        return userToUpdate;
     }
 
     @Override

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.user.controller.UserController;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.repository.InMemoryUserRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
@@ -41,22 +41,22 @@ public class UserTest {
 
     @Test
     public void shouldAddNewUserOrGetThrows() {
-        User user = getUser();
-
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        UserDto user = getUser();
+        user.setId(1);
+        Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
 
         assertTrue(violations.isEmpty());
         controller.addUser(user);
         assertEquals(user, controller.getUserById(1));
 
-        User userWithInvalidEmail = getUser();
+        UserDto userWithInvalidEmail = getUser();
         userWithInvalidEmail.setEmail("user.user");
 
         violations = validator.validate(userWithInvalidEmail);
 
         assertFalse(violations.isEmpty());
 
-        User userWithEmptyName = getUser();
+        UserDto userWithEmptyName = getUser();
         userWithEmptyName.setName("");
 
         violations = validator.validate(userWithEmptyName);
@@ -68,7 +68,8 @@ public class UserTest {
 
     @Test
     public void shouldGetUserOrThrow() {
-        User user = getUser();
+        UserDto user = getUser();
+        user.setId(1);
         controller.addUser(user);
 
         assertEquals(user, controller.getUserById(1));
@@ -77,8 +78,10 @@ public class UserTest {
 
     @Test
     public void shouldGetUsersSet() {
-        User user1 = getUser();
-        User user2 = getUser();
+        UserDto user1 = getUser();
+        user1.setId(1);
+        UserDto user2 = getUser();
+        user2.setId(2);
         user2.setEmail("otherUser@user.com");
 
         assertTrue(controller.getAllUsers().isEmpty());
@@ -93,12 +96,13 @@ public class UserTest {
 
     @Test
     public void shouldUpdateUser() {
-        User user = getUser();
+        UserDto user = getUser();
+        user.setId(1);
         controller.addUser(user);
 
         assertEquals(user, controller.getUserById(1));
 
-        User userToUpdate = new User();
+        UserDto userToUpdate = new UserDto();
         userToUpdate.setName("updateName");
         userToUpdate.setEmail("otherEmail@email.com");
         controller.updateUser(1, userToUpdate);
@@ -109,7 +113,8 @@ public class UserTest {
 
     @Test
     public void shouldRemoveUserById() {
-        User user = getUser();
+        UserDto user = getUser();
+        user.setId(1);
         controller.addUser(user);
 
         assertEquals(controller.getUserById(1), user);

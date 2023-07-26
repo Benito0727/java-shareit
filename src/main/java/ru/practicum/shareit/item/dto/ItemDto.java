@@ -1,34 +1,33 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import ru.practicum.shareit.item.model.Item;
+import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-/**
- * TODO Sprint add-controllers.
- */
+@Data
+public class ItemDto {
 
-@Getter
-@Setter
-public class ItemDto extends Item {
-
-    private final Long id;
+    private long id;
     @NotBlank
-    private final String name;
+    private String name;
 
     @NotBlank
-    private final String description;
+    private String description;
 
     @NotNull
-    private final Boolean available;
+    private Boolean available;
 
-    public ItemDto(Item item) {
-        this.id = item.getId();
-        this.name = item.getName();
-        this.description = item.getDescription();
-        this.available = item.getAvailable();
+    public ItemDto() {
+    }
+
+    public ItemDto(Long id,
+                   String name,
+                   String description,
+                   Boolean available) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
     }
 }
