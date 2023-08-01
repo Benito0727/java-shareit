@@ -5,11 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserEntityDtoMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.repository.InMemoryUserRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,14 +18,14 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private final UserRepository storage;
+    private final InMemoryUserRepository storage;
 
 
     public UserDto addUser(UserDto userDto) {
         try {
             User user = UserEntityDtoMapper.getEntityFromDto(userDto);
             return UserEntityDtoMapper.getDtoFromEntity(storage.addUser(user));
-        } catch (ValidationException | ConflictException exception) {
+        } catch (ConflictException exception) {
             throw new RuntimeException(exception);
         }
     }

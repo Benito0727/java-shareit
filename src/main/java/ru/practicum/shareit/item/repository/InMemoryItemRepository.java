@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.UserItem;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ public class InMemoryItemRepository implements ItemRepository {
     public Item addItem(long userId, Item item) {
             item.setId(++currentItemId);
             log.info("Вещи под названием {}, присвоен ID: {}", item.getName(), item.getId());
-            item.setUserId(userId);
+            item.setUser(new UserItem(userId, item.getId()));
             log.info("Вещь с ID: {} принадлежит пользователю {}", item.getId(), userId);
             items.put(item.getId(), item);
             return item;
@@ -42,7 +43,7 @@ public class InMemoryItemRepository implements ItemRepository {
     public void removeItem(long userId, long itemId) throws NotFoundException, ValidationException {
         Item item = items.get(itemId);
         if (item != null) {
-            if (item.getUserId() == userId) {
+            if (item.getUser().getUserId() == userId) {
                 items.remove(itemId);
                 log.info("Владелец удалил вещь с ID: {}", itemId);
                 return;
@@ -58,7 +59,7 @@ public class InMemoryItemRepository implements ItemRepository {
     public Item updateItem(long userId, long itemId, Item item) throws NotFoundException {
         Item itemToUpdate = items.get(itemId);
         if (itemToUpdate != null) {
-            if (itemToUpdate.getUserId() == userId) {
+            if (itemToUpdate.getUser().getUserId() == userId) {
 
                 if (item.getName() != null) itemToUpdate.setName(item.getName());
                 if (item.getDescription() != null) itemToUpdate.setDescription(item.getDescription());
@@ -79,7 +80,7 @@ public class InMemoryItemRepository implements ItemRepository {
     @Override
     public List<Item> getItemList(long userId) {
         return items.values().stream()
-                .filter(i -> i.getUserId() == userId)
+                .filter(i -> i.getUser().getUserId() == userId)
                 .collect(Collectors.toList());
     }
 
@@ -89,7 +90,7 @@ public class InMemoryItemRepository implements ItemRepository {
         List<Item> foundItems = new ArrayList<>();
 
         for (Item item : itemList) {
-            if (item.getAvailable()) {
+            if (item.getAvailable().getStatus()) {
                 if (substringSearch(item.getName().toLowerCase(), text.toLowerCase()) == 1) foundItems.add(item);
                 if (substringSearch(item.getDescription().toLowerCase(), text.toLowerCase()) == 1) foundItems.add(item);
             }

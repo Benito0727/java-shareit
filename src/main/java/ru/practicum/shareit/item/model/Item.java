@@ -1,30 +1,35 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 
 @Data
+@Entity
+@Table(name = "items")
+@NoArgsConstructor
 public class Item {
 
+    @Id
     private Long id;
 
-    @NotBlank
+    @Column(name = "item_name")
     private String name;
 
-    @NotBlank
+    @Column(name = "item_description")
     private String description;
 
-    @NotNull
-    private Boolean available;
+    @OneToOne
+    private ItemAvailable available;
 
-    private Long userId;
+    @ManyToOne
+    private UserItem user;
 
     public Item(Long id,
                 String name,
                 String description,
-                Boolean available) {
+                ItemAvailable available) {
         this.id = id;
         this.name = name;
         this.description = description;

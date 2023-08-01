@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.service.DBItemService;
 
 import javax.validation.Valid;
 import java.util.Set;
@@ -15,7 +15,7 @@ import java.util.Set;
 public class ItemController {
 
     @Autowired
-    private final ItemServiceImpl service;
+    private final DBItemService service;
 
     @GetMapping
     public Set<ItemDto> getItemSet(@RequestHeader("X-Sharer-User-Id") long userId) {
