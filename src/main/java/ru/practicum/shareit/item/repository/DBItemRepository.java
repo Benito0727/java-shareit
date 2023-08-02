@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface DBItemRepository extends JpaRepository<Item, Long>{
 
-    List<Item> findByNameContainingOrDescriptionContaining(String text, String s);
+    List<Item> findByNameContainingOrDescriptionContainingIgnoreCase(String text1, String text2);
 
+    List<Item> findByOwner(Long id);
 }

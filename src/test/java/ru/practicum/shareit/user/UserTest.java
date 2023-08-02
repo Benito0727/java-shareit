@@ -3,12 +3,12 @@ package ru.practicum.shareit.user;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.repository.InMemoryUserRepository;
-import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+import ru.practicum.shareit.user.repository.DBUserRepository;
+import ru.practicum.shareit.user.service.DBUserService;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -24,6 +24,9 @@ public class UserTest {
 
     private UserController controller;
 
+    @Autowired
+    private DBUserRepository repository;
+
     static Validator validator;
 
     @BeforeAll
@@ -34,8 +37,7 @@ public class UserTest {
 
     @BeforeEach
     public void setController() {
-        UserRepository repository = new InMemoryUserRepository();
-        UserServiceImpl service = new UserServiceImpl(repository);
+        DBUserService service = new DBUserService(repository);
         controller = new UserController(service);
     }
 

@@ -1,23 +1,22 @@
 package ru.practicum.shareit.item;
 
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.exception.ConflictException;
-import ru.practicum.shareit.exception.ValidationException;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.repository.InMemoryItemRepository;
-import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserEntityDtoMapper;
-import ru.practicum.shareit.user.repository.InMemoryUserRepository;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.repository.DBUserRepository;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -31,11 +30,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static ru.practicum.shareit.unit.TestUnit.*;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@TestPropertySource("classpath:application-test.properties")
+@Sql(scripts = "classpath:schema.sql")
 public class ItemTest {
 
+    @Autowired
     private ItemController controller;
 
-    private UserRepository userRepository;
+    @Autowired
+    private DBUserRepository userRepository;
     private static Validator validator;
 
     @BeforeAll
@@ -44,18 +50,10 @@ public class ItemTest {
         validator = factory.getValidator();
     }
 
-    @BeforeEach
-    public void setController() {
-        ItemRepository repository = new InMemoryItemRepository();
-        userRepository = new InMemoryUserRepository();
-        ItemServiceImpl service = new ItemServiceImpl(userRepository, repository);
-        controller = new ItemController(service);
-    }
-
     @Test
-    public void shouldAddItemOrThrow() throws ValidationException, ConflictException {
+    public void shouldAddItemOrThrow() {
         UserDto user = getUser();
-        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user));
+        userRepository.save(UserEntityDtoMapper.getEntityFromDto(user));
 
         ItemDto item = getItem();
         item.setId(1);
@@ -76,14 +74,14 @@ public class ItemTest {
     }
 
     @Test
-    public void shouldGetItemByIdOrThrow() throws ValidationException, ConflictException {
+    public void shouldGetItemByIdOrThrow() {
         UserDto user = getUser();
         user.setId(1);
-        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user));
+        userRepository.save(UserEntityDtoMapper.getEntityFromDto(user));
         UserDto user2 = getUser();
         user2.setId(2);
         user2.setEmail("otheEmail@user.com");
-        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user2));
+        userRepository.save(UserEntityDtoMapper.getEntityFromDto(user2));
 
         ItemDto item = getItem();
         item.setId(1);
@@ -96,15 +94,15 @@ public class ItemTest {
     }
 
     @Test
-    public void shouldGetAllItemsByUserId() throws ValidationException, ConflictException {
+    public void shouldGetAllItemsByUserId() {
         UserDto user1 = getUser();
         user1.setId(1);
         UserDto user2 = getUser();
         user2.setId(2);
         user2.setEmail("updateUser@user.com");
 
-        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user1));
-        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user2));
+        userRepository.save(UserEntityDtoMapper.getEntityFromDto(user1));
+        userRepository.save(UserEntityDtoMapper.getEntityFromDto(user2));
 
         ItemDto item1 = getItem();
         item1.setId(1);
@@ -120,15 +118,15 @@ public class ItemTest {
     }
 
     @Test
-    public void shouldGetAvailableItemsBySearch() throws ValidationException, ConflictException {
+    public void shouldGetAvailableItemsBySearch() {
         UserDto user1 = getUser();
         user1.setId(1);
         UserDto user2 = getUser();
         user2.setId(2);
         user2.setEmail("otherUser@user.com");
 
-        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user1));
-        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user2));
+        userRepository.save(UserEntityDtoMapper.getEntityFromDto(user1));
+        userRepository.save(UserEntityDtoMapper.getEntityFromDto(user2));
 
         ItemDto item1 = getItem();
         item1.setId(1);
@@ -154,10 +152,10 @@ public class ItemTest {
     }
 
     @Test
-    public void shouldRemoveItemOrGetTrows() throws ValidationException, ConflictException {
+    public void shouldRemoveItemOrGetTrows() {
         UserDto user = getUser();
         user.setId(1);
-        userRepository.addUser(UserEntityDtoMapper.getEntityFromDto(user));
+        userRepository.save(UserEntityDtoMapper.getEntityFromDto(user));
 
         ItemDto item = getItem();
         item.setId(1);

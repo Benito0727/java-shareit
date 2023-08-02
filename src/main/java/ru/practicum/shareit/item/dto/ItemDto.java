@@ -18,16 +18,20 @@ public class ItemDto {
     @NotNull
     private Boolean available;
 
+    private Long owner;
+
     public ItemDto() {
     }
 
     public ItemDto(Long id,
                    String name,
                    String description,
-                   Boolean available) {
+                   Boolean available,
+                   Long owner) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.available = available;
+        this.owner = owner;
     }
 }
