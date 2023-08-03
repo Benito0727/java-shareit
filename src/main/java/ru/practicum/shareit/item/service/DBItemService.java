@@ -43,10 +43,10 @@ public class DBItemService implements ItemService {
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         try {
-            userStorage.findById(userId).
-                    orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId)));
-            Item item = storage.findById(itemId).
-                orElseThrow(() -> new NotFoundException(String.format("Не нашли вещи с ID: %d", itemId)));
+            userStorage.findById(userId)
+                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId)));
+            Item item = storage.findById(itemId)
+                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли вещи с ID: %d", itemId)));
             item.setId(itemId);
             if (itemDto.getName() != null) item.setName(itemDto.getName());
             if (itemDto.getDescription() != null) item.setDescription(itemDto.getDescription());
@@ -61,8 +61,8 @@ public class DBItemService implements ItemService {
     @Override
     public ItemDto getItemById(long userId, long itemId) {
         try {
-            return ItemEntityDtoMapper.getItemDtoFromItem(storage.findById(itemId).
-                    orElseThrow(() -> new NotFoundException(String.format("Не нашли вещи с ID: %d", itemId))));
+            return ItemEntityDtoMapper.getItemDtoFromItem(storage.findById(itemId)
+                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли вещи с ID: %d", itemId))));
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
@@ -71,8 +71,8 @@ public class DBItemService implements ItemService {
     @Override
     public void removeItemById(long userId, long itemId) {
         try {
-        storage.findById(itemId).
-                orElseThrow(() -> new NotFoundException(String.format("Не нашли вещи с ID: %d", itemId)));
+        storage.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Не нашли вещи с ID: %d", itemId)));
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
@@ -85,9 +85,9 @@ public class DBItemService implements ItemService {
         for (Item item : itemList) {
             itemSet.add(ItemEntityDtoMapper.getItemDtoFromItem(item));
         }
-        return itemSet.stream().
-                sorted((o1, o2) -> (int) (o1.getId() - o2.getId())).
-                collect(Collectors.toCollection(LinkedHashSet::new));
+        return itemSet.stream()
+                .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
@@ -99,9 +99,9 @@ public class DBItemService implements ItemService {
             itemDtoSet.add(ItemEntityDtoMapper.getItemDtoFromItem(item));
         }
 
-        return itemDtoSet.stream().
-                sorted((o1, o2) -> (int) (o1.getId() - o2.getId())).
-                filter(o -> o.getAvailable().equals(true)).
-                collect(Collectors.toCollection(LinkedHashSet::new));
+        return itemDtoSet.stream()
+                .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
+                .filter(o -> o.getAvailable().equals(true))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

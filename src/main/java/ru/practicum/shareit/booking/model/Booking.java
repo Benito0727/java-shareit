@@ -35,7 +35,8 @@ public class Booking {
     @Column(name = "item_name")
     private String itemName;
 
-    public Booking(LocalDate start, LocalDate end) {
+    public Booking(Long itemId, LocalDate start, LocalDate end) {
+        this.itemId = itemId;
         this.start = start;
         this.end = end;
     }

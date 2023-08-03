@@ -1,31 +1,39 @@
 package ru.practicum.shareit.booking.controller;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.IncomingBookingDto;
+import ru.practicum.shareit.booking.service.DBBookingService;
 
-import javax.validation.Valid;
 import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/bookings")
+@RequiredArgsConstructor
 public class BookingController {
 
+    @Autowired
+    private final DBBookingService service;
+
     @PostMapping
-    public IncomingBookingDto addBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                         @RequestBody @Valid IncomingBookingDto bookingDto) {
-        return null;
+    public BookingDto addBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                 @RequestBody @Valid IncomingBookingDto bookingDto) {
+        return service.addBooking(userId, bookingDto);
     }
 
     @PatchMapping("/{bookingId}")
-    public IncomingBookingDto changeStatus(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingDto changeStatus(@RequestHeader("X-Sharer-User-Id") Long userId,
                                            @PathVariable(value = "bookingId") Long bookingId,
                                            @RequestParam(value = "approved") Boolean isApproved) {
-        return null;
+        return service.changeStatus(userId, bookingId, isApproved);
     }
 
     @GetMapping
-    public Set<IncomingBookingDto> getAllBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                  @RequestParam(value = "state", defaultValue = "All") String state) {
-        return null;
+    public Set<BookingDto> getAllBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                  @RequestParam(value = "state", defaultValue = "all") String state) {
+        return getAllBookings(userId, state);
     }
 }

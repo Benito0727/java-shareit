@@ -4,11 +4,11 @@ import ru.practicum.shareit.booking.model.Booking;
 
 public class BookingDtoEntityMapper {
 
-    public Booking getEntityFromIncomingDto(IncomingBookingDto dto) {
-        return new Booking(dto.getStart(), dto.getEnd());
+    public static Booking getEntityFromIncomingDto(IncomingBookingDto dto) {
+        return new Booking(dto.getItemId(), dto.getStart(), dto.getEnd());
     }
 
-    public BookingDto getDtoFromEntity(Booking booking) {
+    public static BookingDto getDtoFromEntity(Booking booking) {
         return new BookingDto(booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),

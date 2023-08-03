@@ -1,12 +1,12 @@
 package ru.practicum.shareit.exception;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.constraints.NotNull;
 
 @RestControllerAdvice("ru.practicum.shareit")
 @Slf4j
@@ -33,4 +33,10 @@ public class ErrorHandler {
         return new ErrorResponse(HttpStatus.CONFLICT.toString(), exception.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handelForbiddenException(@NotNull final  ForbiddenException exception) {
+        log.error(HttpStatus.FORBIDDEN.toString(), exception.getMessage());
+        return new ErrorResponse(HttpStatus.FORBIDDEN.toString(), exception.getMessage());
+    }
 }

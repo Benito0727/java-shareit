@@ -3,13 +3,14 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserEntityDtoMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.DBUserRepository;
 
-import javax.transaction.Transactional;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,8 +31,8 @@ public class DBUserService implements UserService {
     @Transactional
     public UserDto updateUser(long id, UserDto userDto) {
         try {
-            User user = storage.findById(id).
-                    orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", id)));
+            User user = storage.findById(id)
+                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", id)));
             user.setId(id);
             if (userDto.getName() != null) user.setName(userDto.getName());
             if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
@@ -44,8 +45,8 @@ public class DBUserService implements UserService {
     @Override
     public UserDto getUserById(long id) {
         try {
-            return UserEntityDtoMapper.getDtoFromEntity(storage.findById(id).
-                    orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", id))));
+            return UserEntityDtoMapper.getDtoFromEntity(storage.findById(id)
+                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", id))));
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
@@ -55,8 +56,8 @@ public class DBUserService implements UserService {
     @Transactional
     public void removeUser(long id) {
         try {
-            storage.findById(id).
-                    orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", id)));
+            storage.findById(id)
+                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", id)));
             storage.deleteById(id);
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);

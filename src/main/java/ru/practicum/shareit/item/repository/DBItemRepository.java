@@ -7,7 +7,7 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 
 @Repository
-public interface DBItemRepository extends JpaRepository<Item, Long>{
+public interface DBItemRepository extends JpaRepository<Item, Long> {
 
     List<Item> findByNameContainingOrDescriptionContainingIgnoreCase(String text1, String text2);
 
