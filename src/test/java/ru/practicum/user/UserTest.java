@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.user;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -13,12 +13,12 @@ import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.repository.DBUserRepository;
 import ru.practicum.shareit.user.service.DBUserService;
+import ru.practicum.unit.TestUnit;
 
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.unit.TestUnit.*;
 
 @SpringBootTest
 public class UserTest {
@@ -44,7 +44,7 @@ public class UserTest {
 
     @Test
     public void shouldAddNewUserOrGetThrows() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         user.setId(1);
         Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
 
@@ -52,14 +52,14 @@ public class UserTest {
         controller.addUser(user);
         assertEquals(user, controller.getUserById(1));
 
-        UserDto userWithInvalidEmail = getUser();
+        UserDto userWithInvalidEmail = TestUnit.getUser();
         userWithInvalidEmail.setEmail("user.user");
 
         violations = validator.validate(userWithInvalidEmail);
 
         assertFalse(violations.isEmpty());
 
-        UserDto userWithEmptyName = getUser();
+        UserDto userWithEmptyName = TestUnit.getUser();
         userWithEmptyName.setName("");
 
         violations = validator.validate(userWithEmptyName);
@@ -71,7 +71,7 @@ public class UserTest {
 
     @Test
     public void shouldGetUserOrThrow() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         user.setId(1);
         controller.addUser(user);
 
@@ -81,9 +81,9 @@ public class UserTest {
 
     @Test
     public void shouldGetUsersSet() {
-        UserDto user1 = getUser();
+        UserDto user1 = TestUnit.getUser();
         user1.setId(1);
-        UserDto user2 = getUser();
+        UserDto user2 = TestUnit.getUser();
         user2.setId(2);
         user2.setEmail("otherUser@user.com");
 
@@ -99,7 +99,7 @@ public class UserTest {
 
     @Test
     public void shouldUpdateUser() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         user.setId(1);
         controller.addUser(user);
 
@@ -116,7 +116,7 @@ public class UserTest {
 
     @Test
     public void shouldRemoveUserById() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         user.setId(1);
         controller.addUser(user);
 

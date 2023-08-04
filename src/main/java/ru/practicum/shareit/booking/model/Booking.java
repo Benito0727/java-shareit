@@ -1,15 +1,17 @@
 package ru.practicum.shareit.booking.model;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import com.querydsl.core.annotations.QueryEntity;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
+@QueryEntity
 @Data
 @Entity
 @Table(name = "bookings")
-@RequiredArgsConstructor
 public class Booking {
 
     @Id
@@ -17,9 +19,11 @@ public class Booking {
     private Long id;
 
     @Column(name = "start_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate start;
 
     @Column(name = "end_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate end;
 
     @Column(name = "status_id")

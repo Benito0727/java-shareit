@@ -7,14 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoEntityMapper;
-import ru.practicum.shareit.booking.dto.IncomingBookingDto;
-import ru.practicum.shareit.booking.dto.QBooking;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.booking.model.QBooking;
 import ru.practicum.shareit.booking.repository.DBBookingRepository;
-import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.booking.dto.IncomingBookingDto;
+import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.item.repository.DBItemRepository;
 import ru.practicum.shareit.user.repository.DBUserRepository;
 
@@ -112,6 +112,8 @@ public class DBBookingService implements BookingService {
         BooleanExpression byStatus = QBooking.booking.status.eq(Status.APPROVED);
         BooleanExpression byStatDate = QBooking.booking.start.before(LocalDate.now());
         BooleanExpression byEndDate = QBooking.booking.end.after(LocalDate.now());
+
+
 
         Iterable<Booking> foundBookings = storage.findAll(byUserId.and(byStatus.and(byStatDate.and(byEndDate))));
 

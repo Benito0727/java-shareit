@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.item;
 
 
 import jakarta.validation.ConstraintViolation;
@@ -21,13 +21,13 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserEntityDtoMapper;
 import ru.practicum.shareit.user.repository.DBUserRepository;
+import ru.practicum.unit.TestUnit;
 
 
 import java.util.Arrays;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.unit.TestUnit.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -52,10 +52,10 @@ public class ItemTest {
 
     @Test
     public void shouldAddItemOrThrow() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user));
 
-        ItemDto item = getItem();
+        ItemDto item = TestUnit.getItem();
         item.setId(1);
         controller.addItem(1, item);
 
@@ -75,15 +75,15 @@ public class ItemTest {
 
     @Test
     public void shouldGetItemByIdOrThrow() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         user.setId(1);
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user));
-        UserDto user2 = getUser();
+        UserDto user2 = TestUnit.getUser();
         user2.setId(2);
         user2.setEmail("otheEmail@user.com");
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user2));
 
-        ItemDto item = getItem();
+        ItemDto item = TestUnit.getItem();
         item.setId(1);
         controller.addItem(1, item);
 
@@ -95,18 +95,18 @@ public class ItemTest {
 
     @Test
     public void shouldGetAllItemsByUserId() {
-        UserDto user1 = getUser();
+        UserDto user1 = TestUnit.getUser();
         user1.setId(1);
-        UserDto user2 = getUser();
+        UserDto user2 = TestUnit.getUser();
         user2.setId(2);
         user2.setEmail("updateUser@user.com");
 
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user1));
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user2));
 
-        ItemDto item1 = getItem();
+        ItemDto item1 = TestUnit.getItem();
         item1.setId(1);
-        ItemDto item2 = getItem();
+        ItemDto item2 = TestUnit.getItem();
         item2.setId(2);
 
         controller.addItem(1, item1);
@@ -119,20 +119,20 @@ public class ItemTest {
 
     @Test
     public void shouldGetAvailableItemsBySearch() {
-        UserDto user1 = getUser();
+        UserDto user1 = TestUnit.getUser();
         user1.setId(1);
-        UserDto user2 = getUser();
+        UserDto user2 = TestUnit.getUser();
         user2.setId(2);
         user2.setEmail("otherUser@user.com");
 
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user1));
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user2));
 
-        ItemDto item1 = getItem();
+        ItemDto item1 = TestUnit.getItem();
         item1.setId(1);
-        ItemDto item2 = getItem();
+        ItemDto item2 = TestUnit.getItem();
         item2.setId(2);
-        ItemDto item3 = getItem();
+        ItemDto item3 = TestUnit.getItem();
         item3.setId(3);
 
         controller.addItem(1, item1);
@@ -153,11 +153,11 @@ public class ItemTest {
 
     @Test
     public void shouldRemoveItemOrGetTrows() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         user.setId(1);
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user));
 
-        ItemDto item = getItem();
+        ItemDto item = TestUnit.getItem();
         item.setId(1);
         controller.addItem(1, item);
 

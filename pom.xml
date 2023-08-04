@@ -31,9 +31,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.hibernate</groupId>
+			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>6.1.7.Final</version>
+			<version>6.2.3.Final</version>
 		</dependency>
 
 		<dependency>
@@ -83,6 +83,18 @@
             <version>24.0.1</version>
             <scope>compile</scope>
         </dependency>
+
+		<dependency>
+			<groupId>com.querydsl</groupId>
+			<artifactId>querydsl-core</artifactId>
+			<version>5.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.querydsl</groupId>
+			<artifactId>querydsl-jpa</artifactId>
+			<version>5.0.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.querydsl</groupId>
