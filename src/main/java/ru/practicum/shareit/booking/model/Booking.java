@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.*;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -37,11 +38,11 @@ public class Booking {
     @JoinColumn(name = "booker_id", referencedColumnName = "user_id")
     private User booker;
 
-    @Column(name = "item_id")
-    private Long itemId;
+    @ManyToOne
+    @JoinColumn(name = "item_id", referencedColumnName = "item_id")
+    private Item item;
 
-    public Booking(Long itemId, LocalDateTime start, LocalDateTime end) {
-        this.itemId = itemId;
+    public Booking(LocalDateTime start, LocalDateTime end) {
         this.start = start;
         this.end = end;
     }

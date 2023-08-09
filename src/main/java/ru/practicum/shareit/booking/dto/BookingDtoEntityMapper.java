@@ -7,7 +7,7 @@ import ru.practicum.shareit.item.model.Item;
 public class BookingDtoEntityMapper {
 
     public static Booking getEntityFromIncomingDto(IncomingBookingDto dto) {
-        return new Booking(dto.getItemId(), dto.getStart(), dto.getEnd());
+        return new Booking(dto.getStart(), dto.getEnd());
     }
 
     public static BookingDto getDtoFromEntity(Booking booking, Item item) {

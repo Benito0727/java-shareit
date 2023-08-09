@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoEntityMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -38,6 +39,7 @@ public class DBBookingService implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto addBooking(Long userId, IncomingBookingDto dto) {
         try {
             User user = checkUser(userId);
@@ -48,10 +50,10 @@ public class DBBookingService implements BookingService {
                 throw new ValidationException("Дата старта должна быть в будущем" +
                         " и дата окончания должна быть позже даты старта");
             }
-            Item item = itemStorage.findById(booking.getItemId())
+            Item item = itemStorage.findById(dto.getItemId())
                             .orElseThrow(
                             () -> new NotFoundException(
-                                    String.format("Не нашли вещь с ID: %d", booking.getItemId())
+                                    String.format("Не нашли вещь с ID: %d", dto.getItemId())
                             )
                     );
             if (item.getOwner().getId() == userId) {
@@ -60,6 +62,7 @@ public class DBBookingService implements BookingService {
             if (item.getAvailable()) {
                 booking.setBooker(user);
                 booking.setStatus(Status.WAITING);
+                booking.setItem(item);
                 return BookingDtoEntityMapper.getDtoFromEntity(storage.save(booking), item);
             } else {
                 throw new BadRequestException(String.format("Вещь с ID: %d недоступна", item.getId()));
@@ -70,6 +73,7 @@ public class DBBookingService implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto setApproved(Long userId, Long bookingId, Boolean isApproved) {
         try {
             checkUser(userId);
@@ -78,8 +82,8 @@ public class DBBookingService implements BookingService {
                     () -> new NotFoundException(String.format("Не нашли заявку с ID: %d", bookingId))
             );
 
-            Item item = itemStorage.findById(booking.getItemId()).orElseThrow(
-                    () -> new NotFoundException(String.format("Не нашли вещь с ID: %d", booking.getItemId()))
+            Item item = itemStorage.findById(booking.getItem().getId()).orElseThrow(
+                    () -> new NotFoundException(String.format("Не нашли вещь с ID: %d", booking.getItem().getId()))
             );
             if (item.getOwner().getId() != userId) {
                 throw new NotFoundException("Только владелец имеет доступ к этой функции");
@@ -97,6 +101,7 @@ public class DBBookingService implements BookingService {
     }
 
     @Override
+    @Transactional
     public Set<BookingDto> findAllByUserId(Long userId, String state) {
         try {
            checkUser(userId);
@@ -138,7 +143,7 @@ public class DBBookingService implements BookingService {
             dtoSet.add(
                     BookingDtoEntityMapper.getDtoFromEntity(
                             booking,
-                            itemStorage.findById(booking.getItemId()).orElseThrow())
+                            itemStorage.findById(booking.getItem().getId()).orElseThrow())
             );
         }
 
@@ -196,6 +201,7 @@ public class DBBookingService implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto findByBookingId(Long userId, Long bookingId) {
         try {
             checkUser(userId);
@@ -204,8 +210,8 @@ public class DBBookingService implements BookingService {
                             () -> new NotFoundException(String.format("Не нашли заявку с ID: %d", bookingId))
                     );
 
-            Item item = itemStorage.findById(booking.getItemId()).orElseThrow(
-                    () -> new NotFoundException(String.format("Не нашли вещь с ID: %d", booking.getItemId()))
+            Item item = itemStorage.findById(booking.getItem().getId()).orElseThrow(
+                    () -> new NotFoundException(String.format("Не нашли вещь с ID: %d", booking.getItem().getId()))
             );
             if (booking.getBooker().getId() != userId) {
                 if (item.getOwner().getId() != userId) {
@@ -233,6 +239,7 @@ public class DBBookingService implements BookingService {
     }
 
     @Override
+    @Transactional
     public Set<BookingDto> findAllByItemId(Long itemId) {
         return getDtoSetFromList(storage.findAllByItemId(itemId));
     }
