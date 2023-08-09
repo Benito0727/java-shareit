@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.model;
 import lombok.Data;
 
 import jakarta.persistence.*;
+import ru.practicum.shareit.user.model.User;
 
 @Data
 @Entity
@@ -23,8 +24,9 @@ public class Item {
     @Column(name = "is_available")
     private Boolean available;
 
-    @Column(name = "owner_id")
-    private Long owner;
+    @ManyToOne
+    @JoinColumn(name = "owner_id", referencedColumnName = "user_id")
+    private User owner;
 
     @Column(name = "last_booking_id")
     private Long lastBookingId;
@@ -35,11 +37,10 @@ public class Item {
     public Item() {
     }
 
-    public Item(Long id, String name, String description, Boolean available, Long owner) {
+    public Item(Long id, String name, String description, Boolean available) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.available = available;
-        this.owner = owner;
     }
 }

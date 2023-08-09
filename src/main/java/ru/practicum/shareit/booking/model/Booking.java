@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.*;
+import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
@@ -32,8 +33,9 @@ public class Booking {
     @Enumerated(EnumType.ORDINAL)
     private Status status;
 
-    @Column(name = "booker_id")
-    private Long booker;
+    @ManyToOne
+    @JoinColumn(name = "booker_id", referencedColumnName = "user_id")
+    private User booker;
 
     @Column(name = "item_id")
     private Long itemId;

@@ -13,6 +13,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.booking.dto.IncomingBookingDto;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.repository.DBItemRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.DBUserRepository;
 
 
@@ -39,7 +40,7 @@ public class DBBookingService implements BookingService {
     @Override
     public BookingDto addBooking(Long userId, IncomingBookingDto dto) {
         try {
-            checkUser(userId);
+            User user = checkUser(userId);
             Booking booking = BookingDtoEntityMapper.getEntityFromIncomingDto(dto);
             if (booking.getStart().toLocalDate().isAfter(booking.getEnd().toLocalDate()) ||
                 booking.getStart().equals(booking.getEnd()) ||
@@ -53,11 +54,11 @@ public class DBBookingService implements BookingService {
                                     String.format("Не нашли вещь с ID: %d", booking.getItemId())
                             )
                     );
-            if (Objects.equals(item.getOwner(), userId)) {
+            if (item.getOwner().getId() == userId) {
                 throw new NotFoundException("Владелец хочет создать заявку на свою вещь");
             }
             if (item.getAvailable()) {
-                booking.setBooker(userId);
+                booking.setBooker(user);
                 booking.setStatus(Status.WAITING);
                 return BookingDtoEntityMapper.getDtoFromEntity(storage.save(booking), item);
             } else {
@@ -80,7 +81,7 @@ public class DBBookingService implements BookingService {
             Item item = itemStorage.findById(booking.getItemId()).orElseThrow(
                     () -> new NotFoundException(String.format("Не нашли вещь с ID: %d", booking.getItemId()))
             );
-            if (!item.getOwner().equals(userId)) {
+            if (item.getOwner().getId() != userId) {
                 throw new NotFoundException("Только владелец имеет доступ к этой функции");
             }
             if (booking.getStatus().equals(Status.APPROVED) && isApproved) throw new BadRequestException();
@@ -102,26 +103,26 @@ public class DBBookingService implements BookingService {
 
             switch (state.toLowerCase()) {
                 case "all":
-                    return getDtoSetFromList(storage.findAllByBooker(userId));
+                    return getDtoSetFromList(storage.findAllByBookerId(userId));
                 case "current":
                     return getDtoSetFromList(
-                      storage.findAllByBookerAndStatusAndEndIsAfter(userId, Status.APPROVED, LocalDateTime.now())
+                      storage.findAllByBookerIdAndStatusAndEndIsAfter(userId, Status.APPROVED, LocalDateTime.now())
                     );
                 case "past":
                     return getDtoSetFromList(
-                            storage.findAllByBookerAndStatus(userId, Status.PAST)
+                            storage.findAllByBookerIdAndStatus(userId, Status.PAST)
                     );
                 case "waiting":
                     return getDtoSetFromList(
-                            storage.findAllByBookerAndStatus(userId, Status.WAITING)
+                            storage.findAllByBookerIdAndStatus(userId, Status.WAITING)
                     );
                 case "rejected":
                     return getDtoSetFromList(
-                            storage.findAllByBookerAndStatus(userId, Status.REJECTED)
+                            storage.findAllByBookerIdAndStatus(userId, Status.REJECTED)
                     );
                 case "future":
                     return getDtoSetFromList(
-                            storage.findAllByBookerAndStatusBetween(userId, Status.WAITING, Status.APPROVED)
+                            storage.findAllByBookerIdAndStatusBetween(userId, Status.WAITING, Status.APPROVED)
                     );
                 default:
                     throw new BadRequestException(String.format("Unknown state: %s", state));
@@ -149,7 +150,7 @@ public class DBBookingService implements BookingService {
     public Set<BookingDto> findBookingsToItemsOwner(Long ownerId, String state) {
         try {
             checkUser(ownerId);
-            List<Item> items = itemStorage.findByOwner(ownerId);
+            List<Item> items = itemStorage.findByOwnerId(ownerId);
             List<Booking> bookings = new ArrayList<>();
             switch (state.toLowerCase()) {
                 case "all":
@@ -206,8 +207,8 @@ public class DBBookingService implements BookingService {
             Item item = itemStorage.findById(booking.getItemId()).orElseThrow(
                     () -> new NotFoundException(String.format("Не нашли вещь с ID: %d", booking.getItemId()))
             );
-            if (!Objects.equals(booking.getBooker(), userId)) {
-                if (!Objects.equals(item.getOwner(), userId)) {
+            if (booking.getBooker().getId() != userId) {
+                if (item.getOwner().getId() != userId) {
                     throw new NotFoundException("Эта заявка тебе не принадлежит");
                 }
             }
@@ -221,9 +222,9 @@ public class DBBookingService implements BookingService {
         }
     }
 
-    private void checkUser(Long userId) {
+    private User checkUser(Long userId) {
         try {
-            userStorage.findById(userId).orElseThrow(
+            return userStorage.findById(userId).orElseThrow(
                     () -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId))
             );
         } catch (NotFoundException exception) {

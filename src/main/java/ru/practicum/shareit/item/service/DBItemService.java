@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.DBItemRepository;
 import ru.practicum.shareit.item.dto.ItemEntityDtoMapper;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.DBUserRepository;
 
 import java.util.HashSet;
@@ -31,13 +32,15 @@ public class DBItemService implements ItemService {
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) {
         try {
-            if (userStorage.findById(userId).isPresent()) {
-                Item item = ItemEntityDtoMapper.getItemFromItemDto(itemDto);
-                item.setOwner(userId);
-                return ItemEntityDtoMapper.getItemDtoFromItem(storage.save(item));
-            } else {
-                throw new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId));
-            }
+            User user = userStorage.findById(userId)
+                    .orElseThrow(
+                            () -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId))
+                    );
+            Item item = ItemEntityDtoMapper.getItemFromItemDto(itemDto);
+            item.setOwner(user);
+
+            return ItemEntityDtoMapper.getItemDtoFromItem(storage.save(item));
+
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
@@ -83,7 +86,7 @@ public class DBItemService implements ItemService {
 
     @Override
     public Set<ItemDto> getItemSet(long userId) {
-        List<Item> itemList = storage.findByOwner(userId);
+        List<Item> itemList = storage.findByOwnerId(userId);
         Set<ItemDto> itemSet = new LinkedHashSet<>();
         for (Item item : itemList) {
             itemSet.add(ItemEntityDtoMapper.getItemDtoFromItem(item));

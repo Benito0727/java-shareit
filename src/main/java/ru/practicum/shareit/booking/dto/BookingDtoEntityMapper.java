@@ -16,7 +16,7 @@ public class BookingDtoEntityMapper {
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getStatus(),
-                booking.getBooker(),
+                booking.getBooker().getId(),
                 item.getId(),
                 item.getName()
         );

@@ -11,5 +11,5 @@ public interface DBItemRepository extends JpaRepository<Item, Long> {
 
     List<Item> findByNameContainingOrDescriptionContainingIgnoreCase(String text1, String text2);
 
-    List<Item> findByOwner(Long id);
+    List<Item> findByOwnerId(Long id);
 }

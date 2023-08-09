@@ -4,6 +4,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.model.Item;
+
+import java.util.Set;
 
 @Data
 @Entity
@@ -21,6 +25,18 @@ public class User {
 
     @Column(name = "user_email",nullable = false, unique = true)
     private String email;
+
+    @OneToMany(targetEntity = Item.class,
+                mappedBy = "owner",
+                fetch = FetchType.LAZY,
+                cascade = CascadeType.ALL)
+    private Set<Item> items;
+
+    @OneToMany(targetEntity = Booking.class,
+                mappedBy = "booker",
+                fetch = FetchType.LAZY,
+                cascade = CascadeType.ALL)
+    private Set<Booking> bookings;
 
     public User(Long id, String name, String email) {
         this.id = id;
