@@ -6,25 +6,27 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @QueryEntity
 @Data
 @Entity
 @Table(name = "bookings")
+@RequiredArgsConstructor
 public class Booking {
 
     @Id
+    @Column(name = "booking_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "start_date")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate start;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime start;
 
     @Column(name = "end_date")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate end;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime end;
 
     @Column(name = "status_id")
     @Enumerated(EnumType.ORDINAL)
@@ -36,10 +38,7 @@ public class Booking {
     @Column(name = "item_id")
     private Long itemId;
 
-    @Column(name = "item_name")
-    private String itemName;
-
-    public Booking(Long itemId, LocalDate start, LocalDate end) {
+    public Booking(Long itemId, LocalDateTime start, LocalDateTime end) {
         this.itemId = itemId;
         this.start = start;
         this.end = end;

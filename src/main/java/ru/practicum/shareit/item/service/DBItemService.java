@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -17,13 +16,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class DBItemService implements ItemService {
 
-    @Autowired
     private final DBItemRepository storage;
 
     private final DBUserRepository userStorage;
+
+    @Autowired
+    public DBItemService(DBItemRepository storage, DBUserRepository userStorage) {
+        this.storage = storage;
+        this.userStorage = userStorage;
+    }
 
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) {

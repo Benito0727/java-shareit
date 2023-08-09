@@ -4,18 +4,22 @@ public class ErrorResponse {
 
     private String error;
 
-    private String description;
+    private String status;
 
     public ErrorResponse(String error, String description) {
         this.error = error;
-        this.description = description;
+        this.status = description;
+    }
+
+    public ErrorResponse(String error) {
+        this.error = error;
     }
 
     public String getError() {
         return error;
     }
 
-    public String getDescription() {
-        return description;
+    public String getStatus() {
+        return status;
     }
 }

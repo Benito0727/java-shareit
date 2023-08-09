@@ -1,34 +1,36 @@
 package ru.practicum.shareit.booking.dto;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.item.dto.ItemDtoToBooking;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 
 @Data
 public class BookingDto {
 
     private Long id;
 
-    private LocalDate startDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime start;
 
-    private LocalDate endDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime end;
 
     private Status status;
 
-    private Long bookerId;
+    private Booker booker;
 
-    private Long itemId;
+    private ItemDtoToBooking item;
 
-    private String itemName;
-
-    public BookingDto(Long id, LocalDate startDate, LocalDate endDate, Status status, Long bookerId, Long itemId, String itemName) {
+    public BookingDto(Long id, LocalDateTime start, LocalDateTime end, Status status, Long bookerId, Long itemId, String itemName) {
         this.id = id;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.start = start;
+        this.end = end;
         this.status = status;
-        this.bookerId = bookerId;
-        this.itemId = itemId;
-        this.itemName = itemName;
+        this.booker = new Booker(bookerId);
+        this.item = new ItemDtoToBooking(itemId, itemName);
     }
 }

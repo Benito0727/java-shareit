@@ -9,11 +9,11 @@ public interface BookingService {
 
     BookingDto addBooking(Long bookerId, IncomingBookingDto dto);
 
-    BookingDto changeStatus(Long ownerId, Long bookingId, Boolean isApproved);
+    BookingDto setApproved(Long ownerId, Long bookingId, Boolean isApproved);
 
     Set<BookingDto> findAllByUserId(Long userId, String status);
 
-    BookingDto findByBookingId(Long bookingId);
+    BookingDto findByBookingId(Long userId, Long bookingId);
 
     Set<BookingDto> findAllByItemId(Long itemId);
 }

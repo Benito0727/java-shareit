@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Validated
@@ -14,8 +14,8 @@ public class IncomingBookingDto {
     private Long itemId;
 
     @NotNull
-    private LocalDate start;
+    private LocalDateTime start;
 
     @NotNull
-    private LocalDate end;
+    private LocalDateTime end;
 }
