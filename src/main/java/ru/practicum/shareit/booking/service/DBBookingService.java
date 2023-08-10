@@ -140,6 +140,10 @@ public class DBBookingService implements BookingService {
     private Set<BookingDto> getDtoSetFromList(List<Booking> bookingList) {
         Set<BookingDto> dtoSet = new LinkedHashSet<>();
         for (Booking booking : bookingList) {
+
+            if (booking.getEnd().isBefore(LocalDateTime.now())) {
+                booking.setStatus(Status.PAST);
+            }
             dtoSet.add(
                     BookingDtoEntityMapper.getDtoFromEntity(
                             booking,
@@ -218,6 +222,8 @@ public class DBBookingService implements BookingService {
                     throw new NotFoundException("Эта заявка тебе не принадлежит");
                 }
             }
+
+            if (booking.getEnd().isBefore(LocalDateTime.now())) booking.setStatus(Status.PAST);
 
             return BookingDtoEntityMapper.getDtoFromEntity(
                     booking,

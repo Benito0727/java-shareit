@@ -11,4 +11,15 @@ public class ItemEntityDtoMapper {
     public static ItemDto getItemDtoFromItem(Item item) {
         return new ItemDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable(), item.getOwner().getId());
     }
+
+    public static ItemDtoWithBookings getItemDtoWithBookings(Item item) {
+        return new ItemDtoWithBookings(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                item.getOwner().getId(),
+                item.getNextBookingId(),
+                item.getLastBookingId());
+    }
 }

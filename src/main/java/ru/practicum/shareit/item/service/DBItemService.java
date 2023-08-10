@@ -2,18 +2,18 @@ package ru.practicum.shareit.item.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.DBItemRepository;
 import ru.practicum.shareit.item.dto.ItemEntityDtoMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.DBUserRepository;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,10 +65,12 @@ public class DBItemService implements ItemService {
     }
 
     @Override
-    public ItemDto getItemById(long userId, long itemId) {
+    public ItemDtoWithBookings getItemById(long userId, long itemId) {
         try {
-            return ItemEntityDtoMapper.getItemDtoFromItem(storage.findById(itemId)
-                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли вещи с ID: %d", itemId))));
+            Item item = storage.findById(itemId).
+                    orElseThrow(() -> new NotFoundException(String.format("Не нашли вещи с ID: %d", itemId)));
+
+            return ItemEntityDtoMapper.getItemDtoWithBookings(findNearestBookingsForItem(item));
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
@@ -85,24 +87,38 @@ public class DBItemService implements ItemService {
     }
 
     @Override
-    public Set<ItemDto> getItemSet(long userId) {
+    public Set<ItemDtoWithBookings> getItemSet(long userId) {
         List<Item> itemList = storage.findByOwnerId(userId);
-        Set<ItemDto> itemSet = new LinkedHashSet<>();
+        Set<ItemDtoWithBookings> itemSet = new LinkedHashSet<>();
         for (Item item : itemList) {
-            itemSet.add(ItemEntityDtoMapper.getItemDtoFromItem(item));
+            itemSet.add(ItemEntityDtoMapper.getItemDtoWithBookings(findNearestBookingsForItem(item)));
         }
         return itemSet.stream()
                 .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    private Item findNearestBookingsForItem(Item item) {
+        Set<Booking> bookings = item.getBookings();
+        bookings.stream()
+                .filter(booking -> booking.getStatus().equals(Status.PAST))
+                .max(Comparator.comparing(Booking::getEnd))
+                .ifPresent(lastBooking -> item.setLastBookingId(lastBooking.getId()));
+
+        bookings.stream()
+                .filter(booking -> booking.getStatus().equals(Status.APPROVED))
+                .min(Comparator.comparing(Booking::getStart))
+                .ifPresent(nextBooking -> item.setNextBookingId(nextBooking.getId()));
+        return item;
+    }
+
     @Override
-    public Set<ItemDto> getItemsByText(long userId, String text) {
+    public Set<ItemDtoWithBookings> getItemsByText(long userId, String text) {
         if (text.isEmpty()) return Set.of();
         List<Item> itemList = storage.findByNameContainingOrDescriptionContainingIgnoreCase(text, text);
-        Set<ItemDto> itemDtoSet = new HashSet<>();
+        Set<ItemDtoWithBookings> itemDtoSet = new HashSet<>();
         for (Item item : itemList) {
-            itemDtoSet.add(ItemEntityDtoMapper.getItemDtoFromItem(item));
+            itemDtoSet.add(ItemEntityDtoMapper.getItemDtoWithBookings(findNearestBookingsForItem(item)));
         }
 
         return itemDtoSet.stream()

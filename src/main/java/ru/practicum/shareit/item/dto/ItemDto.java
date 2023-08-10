@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class ItemDto {
 
-    private long id;
+    private Long id;
     @NotBlank
     private String name;
 
