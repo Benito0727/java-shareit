@@ -2,7 +2,9 @@ package ru.practicum.shareit.booking.service;
 
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.IncomingBookingDto;
+import ru.practicum.shareit.booking.model.Booking;
 
+import java.util.List;
 import java.util.Set;
 
 public interface BookingService {
@@ -15,5 +17,5 @@ public interface BookingService {
 
     BookingDto findByBookingId(Long userId, Long bookingId);
 
-    Set<BookingDto> findAllByItemId(Long itemId);
+    List<Booking> findAllByItemId(Long itemId);
 }

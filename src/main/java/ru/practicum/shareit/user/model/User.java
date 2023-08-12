@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Set;
@@ -39,11 +38,11 @@ public class User {
                 cascade = CascadeType.ALL)
     private Set<Booking> bookings;
 
-    @OneToMany(targetEntity = Comment.class,
-                mappedBy = "author",
-                fetch = FetchType.LAZY,
-                cascade = CascadeType.ALL)
-    private Set<Comment> comments;
+//    @OneToMany(targetEntity = Comment.class,
+//                mappedBy = "author",
+//                fetch = FetchType.LAZY,
+//                cascade = CascadeType.ALL)
+//    private Set<Comment> comments;
 
     public User(Long id, String name, String email) {
         this.id = id;

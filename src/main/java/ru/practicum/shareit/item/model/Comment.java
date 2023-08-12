@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
@@ -16,15 +15,19 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
-    private Long id;
+    private Long commentId;
 
     @Column(name = "content")
-    private String content;
+    private String text;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", referencedColumnName = "user_id")
-    private User author;
+    @Column(name = "author_name")
+    private String authorName;
 
     @Column(name = "created_by")
     private LocalDateTime createdBy;
+
+    @ManyToOne(targetEntity = Item.class,
+                fetch = FetchType.EAGER)
+    @JoinColumn(name = "item_id", referencedColumnName = "item_id")
+    private Item item;
 }

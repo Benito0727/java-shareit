@@ -3,6 +3,10 @@ package ru.practicum.shareit.item.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import ru.practicum.shareit.booking.dto.BookingDtoToItem;
+import ru.practicum.shareit.item.dto.comment.CommentDto;
+
+import java.util.Set;
 
 @Data
 public class ItemDto {
@@ -19,18 +23,22 @@ public class ItemDto {
 
     private Long owner;
 
+    private Set<CommentDto> comments;
+
+    private BookingDtoToItem nextBooking;
+
+    private BookingDtoToItem lastBooking;
+
     public ItemDto() {
     }
 
     public ItemDto(Long id,
                    String name,
                    String description,
-                   Boolean available,
-                   Long owner) {
+                   Boolean available) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.available = available;
-        this.owner = owner;
     }
 }

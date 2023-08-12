@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +14,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class DBUserService implements UserService {
 
-    @Autowired
     private final DBUserRepository storage;
+
+    @Autowired
+    public DBUserService(DBUserRepository storage) {
+        this.storage = storage;
+    }
 
     @Override
     @Transactional
@@ -30,38 +32,22 @@ public class DBUserService implements UserService {
     @Override
     @Transactional
     public UserDto updateUser(long id, UserDto userDto) {
-        try {
-            User user = storage.findById(id)
-                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", id)));
-            user.setId(id);
-            if (userDto.getName() != null) user.setName(userDto.getName());
-            if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
-            return UserEntityDtoMapper.getDtoFromEntity(storage.save(user));
-        } catch (NotFoundException exception) {
-            throw new RuntimeException(exception);
-        }
+        User user = checkUser(id);
+        user.setId(id);
+        if (userDto.getName() != null) user.setName(userDto.getName());
+        if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
+        return UserEntityDtoMapper.getDtoFromEntity(storage.save(user));
     }
 
     @Override
     public UserDto getUserById(long id) {
-        try {
-            return UserEntityDtoMapper.getDtoFromEntity(storage.findById(id)
-                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", id))));
-        } catch (NotFoundException exception) {
-            throw new RuntimeException(exception);
-        }
+        return UserEntityDtoMapper.getDtoFromEntity(checkUser(id));
     }
 
     @Override
     @Transactional
     public void removeUser(long id) {
-        try {
-            storage.findById(id)
-                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", id)));
-            storage.deleteById(id);
-        } catch (NotFoundException exception) {
-            throw new RuntimeException(exception);
-        }
+        storage.delete(checkUser(id));
     }
 
     @Override
@@ -75,5 +61,15 @@ public class DBUserService implements UserService {
         return userSet.stream()
                 .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private User checkUser(Long userId) {
+        try {
+            return storage.findById(userId).orElseThrow(
+                    () -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId))
+            );
+        } catch (NotFoundException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 }

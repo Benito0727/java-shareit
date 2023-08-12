@@ -52,7 +52,7 @@ public class ItemTest {
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user));
 
         ItemDto item = TestUnit.getItem();
-        item.setId(1);
+        item.setId(1L);
         controller.addItem(1, item);
 
         assertEquals(item, controller.getItemById(1, 1));
@@ -72,7 +72,7 @@ public class ItemTest {
     @Test
     public void shouldGetItemByIdOrThrow() {
         UserDto user = TestUnit.getUser();
-        user.setId(1);
+        user.setId(1L);
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user));
         UserDto user2 = TestUnit.getUser();
         user2.setId(2);
@@ -80,7 +80,7 @@ public class ItemTest {
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user2));
 
         ItemDto item = TestUnit.getItem();
-        item.setId(1);
+        item.setId(1L);
         controller.addItem(1, item);
 
         assertEquals(item, controller.getItemById(1, 1));
@@ -101,9 +101,9 @@ public class ItemTest {
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user2));
 
         ItemDto item1 = TestUnit.getItem();
-        item1.setId(1);
+        item1.setId(1L);
         ItemDto item2 = TestUnit.getItem();
-        item2.setId(2);
+        item2.setId(2L);
 
         controller.addItem(1, item1);
         controller.addItem(2, item2);
@@ -125,11 +125,11 @@ public class ItemTest {
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user2));
 
         ItemDto item1 = TestUnit.getItem();
-        item1.setId(1);
+        item1.setId(1L);
         ItemDto item2 = TestUnit.getItem();
-        item2.setId(2);
+        item2.setId(2L);
         ItemDto item3 = TestUnit.getItem();
-        item3.setId(3);
+        item3.setId(3L);
 
         controller.addItem(1, item1);
         controller.addItem(1, item2);
@@ -154,7 +154,7 @@ public class ItemTest {
         userRepository.save(UserEntityDtoMapper.getEntityFromDto(user));
 
         ItemDto item = TestUnit.getItem();
-        item.setId(1);
+        item.setId(1L);
         controller.addItem(1, item);
 
         assertEquals(item, controller.getItemById(1, 1));

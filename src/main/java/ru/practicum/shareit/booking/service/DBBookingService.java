@@ -105,17 +105,18 @@ public class DBBookingService implements BookingService {
     public Set<BookingDto> findAllByUserId(Long userId, String state) {
         try {
            checkUser(userId);
-
             switch (state.toLowerCase()) {
                 case "all":
                     return getDtoSetFromList(storage.findAllByBookerId(userId));
                 case "current":
                     return getDtoSetFromList(
-                      storage.findAllByBookerIdAndStatusAndEndIsAfter(userId, Status.APPROVED, LocalDateTime.now())
+                      storage.findAllByBookerIdAndStartIsBeforeAndEndIsAfter(userId,
+                              LocalDateTime.now(),
+                              LocalDateTime.now())
                     );
                 case "past":
                     return getDtoSetFromList(
-                            storage.findAllByBookerIdAndStatus(userId, Status.PAST)
+                            storage.findAllByBookerIdAndEndIsBefore(userId, LocalDateTime.now())
                     );
                 case "waiting":
                     return getDtoSetFromList(
@@ -137,25 +138,6 @@ public class DBBookingService implements BookingService {
         }
     }
 
-    private Set<BookingDto> getDtoSetFromList(List<Booking> bookingList) {
-        Set<BookingDto> dtoSet = new LinkedHashSet<>();
-        for (Booking booking : bookingList) {
-
-            if (booking.getEnd().isBefore(LocalDateTime.now())) {
-                booking.setStatus(Status.PAST);
-            }
-            dtoSet.add(
-                    BookingDtoEntityMapper.getDtoFromEntity(
-                            booking,
-                            itemStorage.findById(booking.getItem().getId()).orElseThrow())
-            );
-        }
-
-        return dtoSet.stream()
-                .sorted(Comparator.comparing(BookingDto::getStart).reversed())
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
     public Set<BookingDto> findBookingsToItemsOwner(Long ownerId, String state) {
         try {
             checkUser(ownerId);
@@ -169,12 +151,16 @@ public class DBBookingService implements BookingService {
                     return getDtoSetFromList(bookings);
                 case "current":
                     for (Item item : items) {
-                        bookings.addAll(storage.findAllByItemIdAndStatus(item.getId(), Status.APPROVED));
+                        bookings.addAll(
+                                storage.findAllByItemIdAndStartIsBeforeAndEndIsAfter(item.getId(),
+                                        LocalDateTime.now(),
+                                        LocalDateTime.now())
+                        );
                     }
                     return getDtoSetFromList(bookings);
                 case "past":
                     for (Item item : items) {
-                        bookings.addAll(storage.findAllByItemIdAndStatus(item.getId(), Status.PAST));
+                        bookings.addAll(storage.findAllByItemIdAndEndBefore(item.getId(), LocalDateTime.now()));
                     }
                     return getDtoSetFromList(bookings);
                 case "rejected":
@@ -184,10 +170,9 @@ public class DBBookingService implements BookingService {
                     return getDtoSetFromList(bookings);
                 case "future":
                     for (Item item : items) {
-                        bookings.addAll(storage.findAllByItemIdAndStatusBetween(
+                        bookings.addAll(storage.findAllByItemIdAndStatusIn(
                                 item.getId(),
-                                Status.WAITING,
-                                Status.APPROVED)
+                                List.of(Status.WAITING, Status.APPROVED))
                         );
                     }
                     return getDtoSetFromList(bookings);
@@ -204,6 +189,20 @@ public class DBBookingService implements BookingService {
         }
     }
 
+    private Set<BookingDto> getDtoSetFromList(List<Booking> bookingList) {
+        Set<BookingDto> dtoSet = new LinkedHashSet<>();
+        for (Booking booking : bookingList) {
+            dtoSet.add(
+                    BookingDtoEntityMapper.getDtoFromEntity(
+                            booking,
+                            itemStorage.findById(booking.getItem().getId()).orElseThrow())
+            );
+        }
+        return dtoSet.stream()
+                .sorted(Comparator.comparing(BookingDto::getStart).reversed())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     @Override
     @Transactional
     public BookingDto findByBookingId(Long userId, Long bookingId) {
@@ -213,7 +212,6 @@ public class DBBookingService implements BookingService {
                     .orElseThrow(
                             () -> new NotFoundException(String.format("Не нашли заявку с ID: %d", bookingId))
                     );
-
             Item item = itemStorage.findById(booking.getItem().getId()).orElseThrow(
                     () -> new NotFoundException(String.format("Не нашли вещь с ID: %d", booking.getItem().getId()))
             );
@@ -222,9 +220,6 @@ public class DBBookingService implements BookingService {
                     throw new NotFoundException("Эта заявка тебе не принадлежит");
                 }
             }
-
-            if (booking.getEnd().isBefore(LocalDateTime.now())) booking.setStatus(Status.PAST);
-
             return BookingDtoEntityMapper.getDtoFromEntity(
                     booking,
                     item
@@ -246,7 +241,7 @@ public class DBBookingService implements BookingService {
 
     @Override
     @Transactional
-    public Set<BookingDto> findAllByItemId(Long itemId) {
-        return getDtoSetFromList(storage.findAllByItemId(itemId));
+    public List<Booking> findAllByItemId(Long itemId) {
+        return storage.findAllByItemId(itemId);
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemEntityDtoMapper;
@@ -69,13 +68,13 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    public Set<ItemDtoWithBookings> getItemSet(long userId) {
+    public Set<ItemDto> getItemSet(long userId) {
         try {
             userRepository.getUserById(userId);
             List<Item> items = repository.getItemList(userId);
-            List<ItemDtoWithBookings> itemsDto = new ArrayList<>();
+            List<ItemDto> itemsDto = new ArrayList<>();
             for (Item item : items) {
-                itemsDto.add(ItemEntityDtoMapper.getItemDtoWithBookings(item));
+                itemsDto.add(ItemEntityDtoMapper.getItemDtoFromItem(item));
             }
             return itemsDto.stream()
                     .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
@@ -85,13 +84,13 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    public Set<ItemDtoWithBookings> getItemsByText(long userId, String text) {
+    public Set<ItemDto> getItemsByText(long userId, String text) {
         try {
             userRepository.getUserById(userId);
             List<Item> items = repository.getItemByText(text);
-            Set<ItemDtoWithBookings> itemDtoSet = new TreeSet<>((o1, o2) -> (int) (o1.getId() - o2.getId()));
+            Set<ItemDto> itemDtoSet = new TreeSet<>((o1, o2) -> (int) (o1.getId() - o2.getId()));
             for (Item item : items) {
-                itemDtoSet.add(ItemEntityDtoMapper.getItemDtoWithBookings(item));
+                itemDtoSet.add(ItemEntityDtoMapper.getItemDtoFromItem(item));
             }
             return itemDtoSet;
         } catch (NotFoundException exception) {

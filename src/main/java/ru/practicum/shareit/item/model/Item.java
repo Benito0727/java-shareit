@@ -38,10 +38,16 @@ public class Item {
     private Set<Booking> bookings;
 
     @Column(name = "last_booking_id")
-    private Long lastBookingId;
+    private Long lastBooking;
 
     @Column(name = "next_booking_id")
-    private Long nextBookingId;
+    private Long nextBooking;
+
+    @OneToMany(targetEntity = Comment.class,
+                cascade = CascadeType.ALL,
+                mappedBy = "item",
+                fetch = FetchType.EAGER)
+    private Set<Comment> comments;
 
     public Item() {
     }
