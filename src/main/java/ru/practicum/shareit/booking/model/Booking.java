@@ -4,7 +4,7 @@ import com.querydsl.core.annotations.QueryEntity;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
