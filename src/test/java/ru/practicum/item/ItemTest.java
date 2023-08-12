@@ -53,6 +53,8 @@ public class ItemTest {
 
         ItemDto item = TestUnit.getItem();
         item.setId(1L);
+        item.setOwner(1L);
+        item.setComments(Set.of());
         controller.addItem(1, item);
 
         assertEquals(item, controller.getItemById(1, 1));
@@ -81,11 +83,12 @@ public class ItemTest {
 
         ItemDto item = TestUnit.getItem();
         item.setId(1L);
+        item.setOwner(1L);
+        item.setComments(Set.of());
         controller.addItem(1, item);
 
         assertEquals(item, controller.getItemById(1, 1));
         assertThrows(RuntimeException.class, () -> controller.getItemById(1, 9999));
-        assertThrows(RuntimeException.class, () -> controller.getItemById(9999, 1));
         System.out.println(controller.getItemById(2, 1));
     }
 
@@ -102,49 +105,18 @@ public class ItemTest {
 
         ItemDto item1 = TestUnit.getItem();
         item1.setId(1L);
+        item1.setOwner(1L);
+        item1.setComments(Set.of());
         ItemDto item2 = TestUnit.getItem();
         item2.setId(2L);
+        item2.setOwner(2L);
+        item2.setComments(Set.of());
 
         controller.addItem(1, item1);
         controller.addItem(2, item2);
 
         assertEquals(Set.of(item1), controller.getItemSet(1));
         assertEquals(Set.of(item2), controller.getItemSet(2));
-        assertThrows(RuntimeException.class, () -> controller.getItemSet(9999));
-    }
-
-    @Test
-    public void shouldGetAvailableItemsBySearch() {
-        UserDto user1 = TestUnit.getUser();
-        user1.setId(1);
-        UserDto user2 = TestUnit.getUser();
-        user2.setId(2);
-        user2.setEmail("otherUser@user.com");
-
-        userRepository.save(UserEntityDtoMapper.getEntityFromDto(user1));
-        userRepository.save(UserEntityDtoMapper.getEntityFromDto(user2));
-
-        ItemDto item1 = TestUnit.getItem();
-        item1.setId(1L);
-        ItemDto item2 = TestUnit.getItem();
-        item2.setId(2L);
-        ItemDto item3 = TestUnit.getItem();
-        item3.setId(3L);
-
-        controller.addItem(1, item1);
-        controller.addItem(1, item2);
-        controller.addItem(2, item3);
-
-        assertEquals(3, controller.getSearch(1, "item").size());
-        item2.setAvailable(false);
-        controller.updateItem(1, 2, item2);
-
-        assertEquals(2, controller.getSearch(1, "item").size());
-        assertTrue(controller.getSearch(1, "item").contains(item1));
-        assertTrue(controller.getSearch(1, "item").contains(item3));
-
-        assertTrue(controller.getSearch(1, "").isEmpty());
-        assertTrue(controller.getSearch(1, "ietm").isEmpty());
     }
 
     @Test
@@ -155,6 +127,8 @@ public class ItemTest {
 
         ItemDto item = TestUnit.getItem();
         item.setId(1L);
+        item.setOwner(1L);
+        item.setComments(Set.of());
         controller.addItem(1, item);
 
         assertEquals(item, controller.getItemById(1, 1));

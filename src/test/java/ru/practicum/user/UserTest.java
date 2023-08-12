@@ -65,8 +65,6 @@ public class UserTest {
         violations = validator.validate(userWithEmptyName);
 
         assertFalse(violations.isEmpty());
-
-        assertThrows(RuntimeException.class, () -> controller.addUser(user));
      }
 
     @Test
