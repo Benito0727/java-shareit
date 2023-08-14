@@ -5,11 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserEntityDtoMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.repository.InMemoryUserRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,14 +18,14 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private final UserRepository storage;
+    private final InMemoryUserRepository storage;
 
 
     public UserDto addUser(UserDto userDto) {
         try {
             User user = UserEntityDtoMapper.getEntityFromDto(userDto);
             return UserEntityDtoMapper.getDtoFromEntity(storage.addUser(user));
-        } catch (ValidationException | ConflictException exception) {
+        } catch (ConflictException exception) {
             throw new RuntimeException(exception);
         }
     }
@@ -56,18 +55,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public Set<UserDto> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         if (storage.getUserList() != null) {
-            List<User> users = storage.getUserList();
-            Set<UserDto> userDtoSet = new TreeSet<>((o1, o2) -> (int) (o1.getId() - o2.getId()));
-            for (User user : users) {
-                userDtoSet.add(UserEntityDtoMapper.getDtoFromEntity(user));
-            }
-            return userDtoSet.stream()
+            return storage.getUserList().stream()
+                    .map(UserEntityDtoMapper::getDtoFromEntity)
                     .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+                    .collect(Collectors.toList());
         } else {
-            return Set.of();
+            return List.of();
         }
     }
 }

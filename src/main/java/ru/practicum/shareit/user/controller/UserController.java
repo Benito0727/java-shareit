@@ -1,13 +1,13 @@
 package ru.practicum.shareit.user.controller;
 
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+import ru.practicum.shareit.user.service.DBUserService;
 
-import javax.validation.Valid;
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,7 +15,7 @@ import java.util.Set;
 public class UserController {
 
     @Autowired
-    private final UserServiceImpl service;
+    private final DBUserService service;
 
     @PostMapping
     public UserDto addUser(@RequestBody @Valid UserDto userDto) {
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping
-    public Set<UserDto> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         return service.getAllUsers();
     }
 }

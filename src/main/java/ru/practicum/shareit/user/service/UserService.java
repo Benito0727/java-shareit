@@ -5,7 +5,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import java.util.Set;
+import java.util.List;
 
 public interface UserService {
 
@@ -17,5 +17,5 @@ public interface UserService {
 
     void removeUser(long id) throws NotFoundException;
 
-    Set<UserDto> getAllUsers();
+    List<UserDto> getAllUsers();
 }

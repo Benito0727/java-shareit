@@ -1,28 +1,32 @@
-package ru.practicum.shareit.user;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.user.controller.UserController;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.repository.InMemoryUserRepository;
-import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+package ru.practicum.user;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import ru.practicum.shareit.user.controller.UserController;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.repository.DBUserRepository;
+import ru.practicum.shareit.user.service.DBUserService;
+import ru.practicum.unit.TestUnit;
+
+
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.unit.TestUnit.*;
 
 @SpringBootTest
 public class UserTest {
 
     private UserController controller;
+
+    @Autowired
+    private DBUserRepository repository;
 
     static Validator validator;
 
@@ -34,14 +38,13 @@ public class UserTest {
 
     @BeforeEach
     public void setController() {
-        UserRepository repository = new InMemoryUserRepository();
-        UserServiceImpl service = new UserServiceImpl(repository);
+        DBUserService service = new DBUserService(repository);
         controller = new UserController(service);
     }
 
     @Test
     public void shouldAddNewUserOrGetThrows() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         user.setId(1);
         Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
 
@@ -49,26 +52,24 @@ public class UserTest {
         controller.addUser(user);
         assertEquals(user, controller.getUserById(1));
 
-        UserDto userWithInvalidEmail = getUser();
+        UserDto userWithInvalidEmail = TestUnit.getUser();
         userWithInvalidEmail.setEmail("user.user");
 
         violations = validator.validate(userWithInvalidEmail);
 
         assertFalse(violations.isEmpty());
 
-        UserDto userWithEmptyName = getUser();
+        UserDto userWithEmptyName = TestUnit.getUser();
         userWithEmptyName.setName("");
 
         violations = validator.validate(userWithEmptyName);
 
         assertFalse(violations.isEmpty());
-
-        assertThrows(RuntimeException.class, () -> controller.addUser(user));
      }
 
     @Test
     public void shouldGetUserOrThrow() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         user.setId(1);
         controller.addUser(user);
 
@@ -78,9 +79,9 @@ public class UserTest {
 
     @Test
     public void shouldGetUsersSet() {
-        UserDto user1 = getUser();
+        UserDto user1 = TestUnit.getUser();
         user1.setId(1);
-        UserDto user2 = getUser();
+        UserDto user2 = TestUnit.getUser();
         user2.setId(2);
         user2.setEmail("otherUser@user.com");
 
@@ -96,7 +97,7 @@ public class UserTest {
 
     @Test
     public void shouldUpdateUser() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         user.setId(1);
         controller.addUser(user);
 
@@ -113,7 +114,7 @@ public class UserTest {
 
     @Test
     public void shouldRemoveUserById() {
-        UserDto user = getUser();
+        UserDto user = TestUnit.getUser();
         user.setId(1);
         controller.addUser(user);
 

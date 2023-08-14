@@ -1,21 +1,29 @@
 package ru.practicum.shareit.item.controller;
 
-import lombok.RequiredArgsConstructor;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.comment.CommentDto;
+import ru.practicum.shareit.item.dto.comment.IncomingCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.service.DBCommentService;
+import ru.practicum.shareit.item.service.DBItemService;
 
-import javax.validation.Valid;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/items")
-@RequiredArgsConstructor
 public class ItemController {
 
+    private final DBItemService service;
+
+    private final DBCommentService commentService;
+
     @Autowired
-    private final ItemServiceImpl service;
+    public ItemController(DBItemService service, DBCommentService commentService) {
+        this.service = service;
+        this.commentService = commentService;
+    }
 
     @GetMapping
     public Set<ItemDto> getItemSet(@RequestHeader("X-Sharer-User-Id") long userId) {
@@ -51,5 +59,12 @@ public class ItemController {
     public Set<ItemDto> getSearch(@RequestHeader("X-Sharer-User-Id") long userId,
                                @RequestParam String text) {
         return service.getItemsByText(userId, text);
+    }
+
+    @PostMapping(value = "/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") long userId,
+                                 @PathVariable(value = "itemId") long itemId,
+                                 @RequestBody @Valid IncomingCommentDto comment) {
+        return commentService.addComment(userId, itemId, comment);
     }
 }

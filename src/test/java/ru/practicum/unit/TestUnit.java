@@ -1,4 +1,4 @@
-package ru.practicum.shareit.unit;
+package ru.practicum.unit;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
