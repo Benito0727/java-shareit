@@ -55,18 +55,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public Set<UserDto> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         if (storage.getUserList() != null) {
-            List<User> users = storage.getUserList();
-            Set<UserDto> userDtoSet = new TreeSet<>((o1, o2) -> (int) (o1.getId() - o2.getId()));
-            for (User user : users) {
-                userDtoSet.add(UserEntityDtoMapper.getDtoFromEntity(user));
-            }
-            return userDtoSet.stream()
+            return storage.getUserList().stream()
+                    .map(UserEntityDtoMapper::getDtoFromEntity)
                     .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+                    .collect(Collectors.toList());
         } else {
-            return Set.of();
+            return List.of();
         }
     }
 }

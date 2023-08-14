@@ -6,9 +6,11 @@ import ru.practicum.shareit.booking.dto.BookingDtoToItem;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.DBBookingService;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.DBCommentRepository;
 import ru.practicum.shareit.item.repository.DBItemRepository;
 import ru.practicum.shareit.item.dto.ItemEntityDtoMapper;
 import ru.practicum.shareit.user.model.User;
@@ -29,12 +31,15 @@ public class DBItemService implements ItemService {
 
     private final DBCommentService commentService;
 
+    private final DBCommentRepository commentStorage;
+
     @Autowired
-    public DBItemService(DBItemRepository storage, DBUserRepository userStorage, DBBookingService dbBookingService, DBCommentService commentService) {
+    public DBItemService(DBItemRepository storage, DBUserRepository userStorage, DBBookingService dbBookingService, DBCommentService commentService, DBCommentRepository commentStorage) {
         this.storage = storage;
         this.userStorage = userStorage;
         this.bookingService = dbBookingService;
         this.commentService = commentService;
+        this.commentStorage = commentStorage;
     }
 
     @Override
@@ -57,16 +62,20 @@ public class DBItemService implements ItemService {
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         try {
-            userStorage.findById(userId)
+            User user = userStorage.findById(userId)
                     .orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId)));
             Item item = checkItem(itemId);
-            item.setId(itemId);
+
+            if (item.getOwner() != user) {
+                throw new BadRequestException(("Только владелец может обновить информацию о вещи"));
+            }
+
             if (itemDto.getName() != null) item.setName(itemDto.getName());
             if (itemDto.getDescription() != null) item.setDescription(itemDto.getDescription());
             if (itemDto.getAvailable() != null) item.setAvailable(itemDto.getAvailable());
 
             return ItemEntityDtoMapper.getItemDtoFromItem(storage.save(item));
-        } catch (NotFoundException exception) {
+        } catch (NotFoundException | BadRequestException exception) {
             throw new RuntimeException(exception);
         }
     }
@@ -90,6 +99,7 @@ public class DBItemService implements ItemService {
         Item item = checkItem(itemId);
         if (item.getOwner().getId() == userId) {
             storage.delete(item);
+            commentStorage.deleteCommentsByItemId(itemId);
         }
     }
 

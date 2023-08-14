@@ -38,12 +38,6 @@ public class User {
                 cascade = CascadeType.ALL)
     private Set<Booking> bookings;
 
-//    @OneToMany(targetEntity = Comment.class,
-//                mappedBy = "author",
-//                fetch = FetchType.LAZY,
-//                cascade = CascadeType.ALL)
-//    private Set<Comment> comments;
-
     public User(Long id, String name, String email) {
         this.id = id;
         this.name = name;

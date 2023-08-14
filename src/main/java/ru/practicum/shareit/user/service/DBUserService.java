@@ -33,7 +33,7 @@ public class DBUserService implements UserService {
     @Transactional
     public UserDto updateUser(long id, UserDto userDto) {
         User user = checkUser(id);
-        user.setId(id);
+
         if (userDto.getName() != null) user.setName(userDto.getName());
         if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
         return UserEntityDtoMapper.getDtoFromEntity(storage.save(user));
@@ -52,15 +52,11 @@ public class DBUserService implements UserService {
 
     @Override
     @Transactional
-    public Set<UserDto> getAllUsers() {
-        List<User> userList = storage.findAll();
-        Set<UserDto> userSet = new HashSet<>();
-        for (User user : userList) {
-            userSet.add(UserEntityDtoMapper.getDtoFromEntity(user));
-        }
-        return userSet.stream()
-                .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+    public List<UserDto> getAllUsers() {
+        return storage.findAll().stream()
+                .sorted(Comparator.comparingLong(User::getId))
+                .map(UserEntityDtoMapper::getDtoFromEntity)
+                .collect(Collectors.toList());
     }
 
     private User checkUser(Long userId) {

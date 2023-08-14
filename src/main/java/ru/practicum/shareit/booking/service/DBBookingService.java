@@ -229,6 +229,12 @@ public class DBBookingService implements BookingService {
         }
     }
 
+    @Override
+    @Transactional
+    public List<Booking> findAllByItemId(Long itemId) {
+        return storage.findAllByItemId(itemId);
+    }
+
     private User checkUser(Long userId) {
         try {
             return userStorage.findById(userId).orElseThrow(
@@ -237,11 +243,5 @@ public class DBBookingService implements BookingService {
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
-    }
-
-    @Override
-    @Transactional
-    public List<Booking> findAllByItemId(Long itemId) {
-        return storage.findAllByItemId(itemId);
     }
 }

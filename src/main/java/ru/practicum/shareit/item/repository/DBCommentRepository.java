@@ -10,4 +10,6 @@ import java.util.Set;
 public interface DBCommentRepository extends JpaRepository<Comment, Long> {
 
     Set<Comment> findCommentsByItemId(Long itemId);
+
+    void deleteCommentsByItemId(Long itemId);
 }
