@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.controller;
 
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.comment.CommentDto;
@@ -9,7 +10,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.DBCommentService;
 import ru.practicum.shareit.item.service.DBItemService;
 
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping("/items")
@@ -26,8 +27,10 @@ public class ItemController {
     }
 
     @GetMapping
-    public Set<ItemDto> getItemSet(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return service.getItemSet(userId);
+    public List<ItemDto> getItemSet(@RequestHeader("X-Sharer-User-Id") long userId,
+                                    @RequestParam(value = "from", defaultValue = "0") Long from,
+                                    @RequestParam(value = "size", defaultValue = "10") Long size) {
+        return service.getItemSet(userId, from, size);
     }
 
     @GetMapping(value = "/{itemId}")
@@ -56,9 +59,11 @@ public class ItemController {
     }
 
     @GetMapping(value = "/search")
-    public Set<ItemDto> getSearch(@RequestHeader("X-Sharer-User-Id") long userId,
-                               @RequestParam String text) {
-        return service.getItemsByText(userId, text);
+    public List<ItemDto> getSearch(@RequestHeader("X-Sharer-User-Id") long userId,
+                                       @RequestParam String text,
+                                       @RequestParam(value = "from", defaultValue = "0") Long from,
+                                       @RequestParam(value = "size", defaultValue = "10") Long size) {
+        return service.getItemsByText(userId, text, from, size);
     }
 
     @PostMapping(value = "/{itemId}/comment")

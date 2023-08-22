@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -15,14 +14,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    @Autowired
     private final UserRepository userRepository;
 
-    @Autowired
     private final ItemRepository repository;
+
+    @Autowired
+    public ItemServiceImpl(UserRepository userRepository, ItemRepository repository) {
+        this.userRepository = userRepository;
+        this.repository = repository;
+    }
 
     public ItemDto createItem(long userId, ItemDto itemDto) {
         try {
@@ -68,7 +70,8 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    public Set<ItemDto> getItemSet(long userId) {
+    @Override
+    public List<ItemDto> getItemSet(long userId, Long from, Long size) {
         try {
             userRepository.getUserById(userId);
             List<Item> items = repository.getItemList(userId);
@@ -78,21 +81,24 @@ public class ItemServiceImpl implements ItemService {
             }
             return itemsDto.stream()
                     .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+                    .collect(Collectors.toCollection(LinkedList::new));
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    public Set<ItemDto> getItemsByText(long userId, String text) {
+    @Override
+    public List<ItemDto> getItemsByText(long userId, String text, Long from, Long size) {
         try {
             userRepository.getUserById(userId);
             List<Item> items = repository.getItemByText(text);
-            Set<ItemDto> itemDtoSet = new TreeSet<>((o1, o2) -> (int) (o1.getId() - o2.getId()));
+            List<ItemDto> itemDtoList = new LinkedList<>();
             for (Item item : items) {
-                itemDtoSet.add(ItemEntityDtoMapper.getItemDtoFromItem(item));
+                itemDtoList.add(ItemEntityDtoMapper.getItemDtoFromItem(item));
             }
-            return itemDtoSet;
+            return itemDtoList.stream()
+                    .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
+                    .collect(Collectors.toCollection(LinkedList::new));
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }

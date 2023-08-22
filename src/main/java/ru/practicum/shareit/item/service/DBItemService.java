@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDtoToItem;
 import ru.practicum.shareit.booking.model.Booking;
@@ -52,6 +54,10 @@ public class DBItemService implements ItemService {
             Item item = ItemEntityDtoMapper.getItemFromItemDto(itemDto);
             item.setOwner(user);
 
+            if (itemDto.getRequestId() != null) {
+                item.setRequestId(itemDto.getRequestId());
+            }
+
             return ItemEntityDtoMapper.getItemDtoFromItem(storage.save(item));
 
         } catch (NotFoundException exception) {
@@ -96,17 +102,26 @@ public class DBItemService implements ItemService {
 
     @Override
     public void removeItemById(long userId, long itemId) {
-        Item item = checkItem(itemId);
-        if (item.getOwner().getId() == userId) {
-            storage.delete(item);
-            commentStorage.deleteCommentsByItemId(itemId);
+        try {
+            Item item = checkItem(itemId);
+            if (item.getOwner().getId() == userId) {
+                storage.delete(item);
+                commentStorage.deleteCommentsByItemId(itemId);
+            } else {
+                throw new BadRequestException("Только владелец может удалить вещь");
+            }
+        } catch (BadRequestException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
     @Override
-    public Set<ItemDto> getItemSet(long userId) {
-        List<Item> itemList = storage.findByOwnerId(userId);
-        Set<ItemDto> itemSet = new LinkedHashSet<>();
+    public List<ItemDto> getItemSet(long userId, Long from, Long size) {
+        List<Item> itemList = storage.findItemsByOwnerId(userId,
+                PageRequest.of(from.intValue(),
+                        size.intValue(),
+                        Sort.by("id")));
+        List<ItemDto> itemSet = new LinkedList<>();
 
         for (Item item : itemList) {
             itemSet.add(setLastNextBookingsToItem(item));
@@ -118,7 +133,7 @@ public class DBItemService implements ItemService {
 
         return itemSet.stream()
                 .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     private ItemDto setLastNextBookingsToItem(Item item) {
@@ -162,9 +177,14 @@ public class DBItemService implements ItemService {
     }
 
     @Override
-    public Set<ItemDto> getItemsByText(long userId, String text) {
-        if (text.isEmpty()) return Set.of();
-        List<Item> itemList = storage.findByNameContainingOrDescriptionContainingIgnoreCase(text, text);
+    public List<ItemDto> getItemsByText(long userId, String text, Long from, Long size) {
+        if (text.isEmpty()) return List.of();
+        List<Item> itemList = storage.findByNameContainingOrDescriptionContainingIgnoreCase(text,
+                text,
+                PageRequest.of(from.intValue(),
+                        size.intValue(),
+                        Sort.by("id")));
+
         Set<ItemDto> itemDtoSet = new HashSet<>();
         for (Item item : itemList) {
             itemDtoSet.add(setLastNextBookingsToItem(item));
@@ -173,7 +193,7 @@ public class DBItemService implements ItemService {
         return itemDtoSet.stream()
                 .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
                 .filter(o -> o.getAvailable().equals(true))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     private Item checkItem(Long itemId) {

@@ -4,7 +4,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 
-import java.util.Set;
+import java.util.List;
 
 public interface ItemService {
 
@@ -16,8 +16,8 @@ public interface ItemService {
 
     void removeItemById(long userId, long itemId) throws NotFoundException, ValidationException;
 
-    Set<ItemDto> getItemSet(long userId);
+    List<ItemDto> getItemSet(long userId, Long from, Long size);
 
-    Set<ItemDto> getItemsByText(long userId, String text) throws NotFoundException;
+    List<ItemDto> getItemsByText(long userId, String text, Long from, Long size) throws NotFoundException;
 
 }

@@ -1,14 +1,16 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Data;
-
 import javax.persistence.*;
+
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "items")
 public class Item {
@@ -48,6 +50,9 @@ public class Item {
                 mappedBy = "item",
                 fetch = FetchType.EAGER)
     private Set<Comment> comments;
+
+    @Column(name = "request_id")
+    private Long requestId;
 
     public Item() {
     }

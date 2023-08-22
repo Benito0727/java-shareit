@@ -1,13 +1,14 @@
 package ru.practicum.shareit.booking.controller;
 
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.IncomingBookingDto;
 import ru.practicum.shareit.booking.service.DBBookingService;
 
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
@@ -34,9 +35,11 @@ public class BookingController {
     }
 
     @GetMapping
-    public Set<BookingDto> getAllBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                  @RequestParam(value = "state", defaultValue = "all") String state) {
-        return service.findAllByUserId(userId, state);
+    public List<BookingDto> getAllBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                          @RequestParam(value = "state", defaultValue = "all") String state,
+                                          @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                          @RequestParam(value = "size", defaultValue = "10") Integer size) {
+        return service.findAllByUserId(userId, state, from, size);
     }
 
     @GetMapping("/{bookingId}")
@@ -46,8 +49,10 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public Set<BookingDto> getAllForOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                          @RequestParam(value = "state", defaultValue = "all") String state) {
-        return service.findBookingsToItemsOwner(userId, state);
+    public List<BookingDto> getAllForOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                           @RequestParam(value = "state", defaultValue = "all") String state,
+                                           @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                           @RequestParam(value = "size", defaultValue = "10") Integer size) {
+        return service.findBookingsToItemsOwner(userId, state, from, size);
     }
 }

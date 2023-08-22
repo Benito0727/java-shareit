@@ -1,15 +1,22 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 
+import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
@@ -28,15 +35,21 @@ public class User {
 
     @OneToMany(targetEntity = Item.class,
                 mappedBy = "owner",
-                fetch = FetchType.LAZY,
-                cascade = CascadeType.ALL)
+                fetch = FetchType.LAZY)
+    @Fetch(value = FetchMode.SELECT)
     private Set<Item> items;
 
     @OneToMany(targetEntity = Booking.class,
                 mappedBy = "booker",
-                fetch = FetchType.LAZY,
-                cascade = CascadeType.ALL)
+                fetch = FetchType.LAZY)
+    @Fetch(value = FetchMode.SELECT)
     private Set<Booking> bookings;
+
+    @OneToMany(targetEntity = ItemRequest.class,
+                mappedBy = "author",
+                fetch = FetchType.LAZY)
+    @Fetch(value = FetchMode.SELECT)
+    private List<ItemRequest> requests;
 
     public User(Long id, String name, String email) {
         this.id = id;

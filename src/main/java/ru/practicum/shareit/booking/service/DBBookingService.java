@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -17,11 +19,8 @@ import ru.practicum.shareit.item.repository.DBItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.DBUserRepository;
 
-
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-
 @Service
 public class DBBookingService implements BookingService {
 
@@ -102,33 +101,55 @@ public class DBBookingService implements BookingService {
 
     @Override
     @Transactional
-    public Set<BookingDto> findAllByUserId(Long userId, String state) {
+    public List<BookingDto> findAllByUserId(Long userId, String state, Integer from, Integer size) {
         try {
            checkUser(userId);
             switch (state.toLowerCase()) {
                 case "all":
-                    return getDtoSetFromList(storage.findAllByBookerId(userId));
+                    return getDtoList(storage.findAllByBookerId(userId,
+                            PageRequest.of(from,
+                                    size,
+                                    Sort.by("start").descending())));
                 case "current":
-                    return getDtoSetFromList(
+                    return getDtoList(
                       storage.findAllByBookerIdAndStartIsBeforeAndEndIsAfter(userId,
                               LocalDateTime.now(),
-                              LocalDateTime.now())
+                              LocalDateTime.now(),
+                              PageRequest.of(from,
+                                      size,
+                                      Sort.by("start").descending()))
                     );
                 case "past":
-                    return getDtoSetFromList(
-                            storage.findAllByBookerIdAndEndIsBefore(userId, LocalDateTime.now())
+                    return getDtoList(
+                            storage.findAllByBookerIdAndEndIsBefore(userId,
+                                    LocalDateTime.now(),
+                                    PageRequest.of(from,
+                                            size,
+                                            Sort.by("start").descending()))
                     );
                 case "waiting":
-                    return getDtoSetFromList(
-                            storage.findAllByBookerIdAndStatus(userId, Status.WAITING)
+                    return getDtoList(
+                            storage.findAllByBookerIdAndStatus(userId,
+                                    Status.WAITING,
+                                    PageRequest.of(from,
+                                            size,
+                                            Sort.by("start").descending()))
                     );
                 case "rejected":
-                    return getDtoSetFromList(
-                            storage.findAllByBookerIdAndStatus(userId, Status.REJECTED)
+                    return getDtoList(
+                            storage.findAllByBookerIdAndStatus(userId,
+                                    Status.REJECTED,
+                                    PageRequest.of(from,
+                                            size,
+                                            Sort.by("start").descending()))
                     );
                 case "future":
-                    return getDtoSetFromList(
-                            storage.findAllByBookerIdAndStatusBetween(userId, Status.WAITING, Status.APPROVED)
+                    return getDtoList(
+                            storage.findAllByBookerIdAndStatusBetween(userId, Status.WAITING,
+                                    Status.APPROVED,
+                                    PageRequest.of(from,
+                                            size,
+                                            Sort.by("start").descending()))
                     );
                 default:
                     throw new BadRequestException(String.format("Unknown state: %s", state));
@@ -138,7 +159,7 @@ public class DBBookingService implements BookingService {
         }
     }
 
-    public Set<BookingDto> findBookingsToItemsOwner(Long ownerId, String state) {
+    public List<BookingDto> findBookingsToItemsOwner(Long ownerId, String state, Integer from, Integer size) {
         try {
             checkUser(ownerId);
             List<Item> items = itemStorage.findByOwnerId(ownerId);
@@ -146,41 +167,62 @@ public class DBBookingService implements BookingService {
             switch (state.toLowerCase()) {
                 case "all":
                     for (Item item : items) {
-                        bookings.addAll(storage.findAllByItemId(item.getId()));
+                        bookings.addAll(storage.findAllBookingsByItemId(item.getId(),
+                                PageRequest.of(from,
+                                        size,
+                                        Sort.by("start").descending())));
                     }
-                    return getDtoSetFromList(bookings);
+                    return getDtoList(bookings);
                 case "current":
                     for (Item item : items) {
                         bookings.addAll(
                                 storage.findAllByItemIdAndStartIsBeforeAndEndIsAfter(item.getId(),
                                         LocalDateTime.now(),
-                                        LocalDateTime.now())
+                                        LocalDateTime.now(),
+                                        PageRequest.of(from,
+                                                        size,
+                                                         Sort.by("start").descending()))
                         );
                     }
-                    return getDtoSetFromList(bookings);
+                    return getDtoList(bookings);
                 case "past":
                     for (Item item : items) {
-                        bookings.addAll(storage.findAllByItemIdAndEndBefore(item.getId(), LocalDateTime.now()));
+                        bookings.addAll(storage.findAllByItemIdAndEndBefore(item.getId(),
+                                LocalDateTime.now(),
+                                PageRequest.of(from,
+                                        size,
+                                        Sort.by("start").descending())));
                     }
-                    return getDtoSetFromList(bookings);
+                    return getDtoList(bookings);
                 case "rejected":
                     for (Item item : items) {
-                        bookings.addAll(storage.findAllByItemIdAndStatus(item.getId(), Status.REJECTED));
+                        bookings.addAll(storage.findAllByItemIdAndStatus(item.getId(),
+                                Status.REJECTED,
+                                PageRequest.of(from,
+                                        size,
+                                        Sort.by("start").descending())));
                     }
-                    return getDtoSetFromList(bookings);
+                    return getDtoList(bookings);
                 case "future":
                     for (Item item : items) {
                         bookings.addAll(storage.findAllByItemIdAndStatusIn(
                                 item.getId(),
-                                List.of(Status.WAITING, Status.APPROVED))
+                                List.of(Status.WAITING, Status.APPROVED),
+                                PageRequest.of(from,
+                                        size,
+                                        Sort.by("start").descending()))
                         );
                     }
-                    return getDtoSetFromList(bookings);
+                    return getDtoList(bookings);
                 case "waiting":
                     for (Item item : items) {
-                        bookings.addAll(storage.findAllByItemIdAndStatus(item.getId(), Status.WAITING));
+                        bookings.addAll(storage.findAllByItemIdAndStatus(item.getId(),
+                                Status.WAITING,
+                                PageRequest.of(from,
+                                        size,
+                                        Sort.by("start").descending())));
                     }
-                    return getDtoSetFromList(bookings);
+                    return getDtoList(bookings);
                 default:
                     throw new BadRequestException(String.format("Unknown state: %s", state));
             }
@@ -189,8 +231,8 @@ public class DBBookingService implements BookingService {
         }
     }
 
-    private Set<BookingDto> getDtoSetFromList(List<Booking> bookingList) {
-        Set<BookingDto> dtoSet = new LinkedHashSet<>();
+    private List<BookingDto> getDtoList(List<Booking> bookingList) {
+        List<BookingDto> dtoSet = new LinkedList<>();
         for (Booking booking : bookingList) {
             dtoSet.add(
                     BookingDtoEntityMapper.getDtoFromEntity(
@@ -198,9 +240,7 @@ public class DBBookingService implements BookingService {
                             itemStorage.findById(booking.getItem().getId()).orElseThrow())
             );
         }
-        return dtoSet.stream()
-                .sorted(Comparator.comparing(BookingDto::getStart).reversed())
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        return dtoSet;
     }
 
     @Override

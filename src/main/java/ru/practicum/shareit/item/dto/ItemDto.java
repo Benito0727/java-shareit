@@ -29,6 +29,8 @@ public class ItemDto {
 
     private BookingDtoToItem lastBooking;
 
+    private Long requestId;
+
     public ItemDto() {
     }
 
