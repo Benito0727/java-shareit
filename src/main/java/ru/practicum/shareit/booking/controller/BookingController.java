@@ -36,10 +36,10 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAllBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                          @RequestParam(value = "state", defaultValue = "all") String state,
-                                          @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                          @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        return service.findAllByUserId(userId, state, from, size);
+                                           @RequestParam(value = "state", defaultValue = "all") String state,
+                                           @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                           @RequestParam(value = "size", defaultValue = "10") Integer size) {
+        return service.findAllByUserId(userId, state, from, size).getPageList();
     }
 
     @GetMapping("/{bookingId}")
@@ -50,9 +50,9 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDto> getAllForOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                           @RequestParam(value = "state", defaultValue = "all") String state,
-                                           @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                           @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        return service.findBookingsToItemsOwner(userId, state, from, size);
+                                                      @RequestParam(value = "state", defaultValue = "all") String state,
+                                                      @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                                      @RequestParam(value = "size", defaultValue = "10") Integer size) {
+        return service.findBookingsToItemsOwner(userId, state, from, size).getPageList();
     }
 }

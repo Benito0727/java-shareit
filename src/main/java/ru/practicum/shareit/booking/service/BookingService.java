@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import org.springframework.beans.support.PagedListHolder;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.IncomingBookingDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -12,7 +13,7 @@ public interface BookingService {
 
     BookingDto setApproved(Long ownerId, Long bookingId, Boolean isApproved);
 
-    List<BookingDto> findAllByUserId(Long userId, String status, Integer from, Integer size);
+    PagedListHolder<BookingDto> findAllByUserId(Long userId, String status, Integer from, Integer size);
 
     BookingDto findByBookingId(Long userId, Long bookingId);
 

@@ -1,8 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -21,6 +20,11 @@ import ru.practicum.shareit.user.repository.DBUserRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.booking.dto.BookingDtoEntityMapper.getDtoFromEntity;
+
+
 @Service
 public class DBBookingService implements BookingService {
 
@@ -62,7 +66,7 @@ public class DBBookingService implements BookingService {
                 booking.setBooker(user);
                 booking.setStatus(Status.WAITING);
                 booking.setItem(item);
-                return BookingDtoEntityMapper.getDtoFromEntity(storage.save(booking), item);
+                return getDtoFromEntity(storage.save(booking), item);
             } else {
                 throw new BadRequestException(String.format("Вещь с ID: %d недоступна", item.getId()));
             }
@@ -93,7 +97,7 @@ public class DBBookingService implements BookingService {
             } else {
                 booking.setStatus(Status.REJECTED);
             }
-            return BookingDtoEntityMapper.getDtoFromEntity(storage.save(booking), item);
+            return getDtoFromEntity(storage.save(booking), item);
         } catch (NotFoundException | BadRequestException exception) {
             throw new RuntimeException(exception);
         }
@@ -101,55 +105,49 @@ public class DBBookingService implements BookingService {
 
     @Override
     @Transactional
-    public List<BookingDto> findAllByUserId(Long userId, String state, Integer from, Integer size) {
+    public PagedListHolder<BookingDto> findAllByUserId(Long userId, String state, Integer from, Integer size) {
         try {
            checkUser(userId);
             switch (state.toLowerCase()) {
                 case "all":
-                    return getDtoList(storage.findAllByBookerId(userId,
-                            PageRequest.of(from,
-                                    size,
-                                    Sort.by("start").descending())));
+                    return getPagedDtoList(storage.findAllByBookerId(userId),
+                            from,
+                            size);
                 case "current":
-                    return getDtoList(
+                    return getPagedDtoList(
                       storage.findAllByBookerIdAndStartIsBeforeAndEndIsAfter(userId,
                               LocalDateTime.now(),
-                              LocalDateTime.now(),
-                              PageRequest.of(from,
-                                      size,
-                                      Sort.by("start").descending()))
+                              LocalDateTime.now()),
+                            from,
+                            size
                     );
                 case "past":
-                    return getDtoList(
+                    return getPagedDtoList(
                             storage.findAllByBookerIdAndEndIsBefore(userId,
-                                    LocalDateTime.now(),
-                                    PageRequest.of(from,
-                                            size,
-                                            Sort.by("start").descending()))
+                                    LocalDateTime.now()),
+                            from,
+                            size
                     );
                 case "waiting":
-                    return getDtoList(
+                    return getPagedDtoList(
                             storage.findAllByBookerIdAndStatus(userId,
-                                    Status.WAITING,
-                                    PageRequest.of(from,
-                                            size,
-                                            Sort.by("start").descending()))
+                                    Status.WAITING),
+                            from,
+                            size
                     );
                 case "rejected":
-                    return getDtoList(
+                    return getPagedDtoList(
                             storage.findAllByBookerIdAndStatus(userId,
-                                    Status.REJECTED,
-                                    PageRequest.of(from,
-                                            size,
-                                            Sort.by("start").descending()))
+                                    Status.REJECTED),
+                                    from,
+                                    size
                     );
                 case "future":
-                    return getDtoList(
+                    return getPagedDtoList(
                             storage.findAllByBookerIdAndStatusBetween(userId, Status.WAITING,
-                                    Status.APPROVED,
-                                    PageRequest.of(from,
-                                            size,
-                                            Sort.by("start").descending()))
+                                    Status.APPROVED),
+                            from,
+                            size
                     );
                 default:
                     throw new BadRequestException(String.format("Unknown state: %s", state));
@@ -159,7 +157,7 @@ public class DBBookingService implements BookingService {
         }
     }
 
-    public List<BookingDto> findBookingsToItemsOwner(Long ownerId, String state, Integer from, Integer size) {
+    public PagedListHolder<BookingDto> findBookingsToItemsOwner(Long ownerId, String state, Integer from, Integer size) {
         try {
             checkUser(ownerId);
             List<Item> items = itemStorage.findByOwnerId(ownerId);
@@ -167,62 +165,44 @@ public class DBBookingService implements BookingService {
             switch (state.toLowerCase()) {
                 case "all":
                     for (Item item : items) {
-                        bookings.addAll(storage.findAllBookingsByItemId(item.getId(),
-                                PageRequest.of(from,
-                                        size,
-                                        Sort.by("start").descending())));
+                        bookings.addAll(storage.findAllBookingsByItemId(item.getId()));
                     }
-                    return getDtoList(bookings);
+                    return getPagedDtoList(bookings, from, size);
                 case "current":
                     for (Item item : items) {
                         bookings.addAll(
                                 storage.findAllByItemIdAndStartIsBeforeAndEndIsAfter(item.getId(),
                                         LocalDateTime.now(),
-                                        LocalDateTime.now(),
-                                        PageRequest.of(from,
-                                                        size,
-                                                         Sort.by("start").descending()))
+                                        LocalDateTime.now())
                         );
                     }
-                    return getDtoList(bookings);
+                    return getPagedDtoList(bookings, from, size);
                 case "past":
                     for (Item item : items) {
                         bookings.addAll(storage.findAllByItemIdAndEndBefore(item.getId(),
-                                LocalDateTime.now(),
-                                PageRequest.of(from,
-                                        size,
-                                        Sort.by("start").descending())));
+                                LocalDateTime.now()));
                     }
-                    return getDtoList(bookings);
+                    return getPagedDtoList(bookings, from, size);
                 case "rejected":
                     for (Item item : items) {
                         bookings.addAll(storage.findAllByItemIdAndStatus(item.getId(),
-                                Status.REJECTED,
-                                PageRequest.of(from,
-                                        size,
-                                        Sort.by("start").descending())));
+                                Status.REJECTED));
                     }
-                    return getDtoList(bookings);
+                    return getPagedDtoList(bookings,from, size);
                 case "future":
                     for (Item item : items) {
                         bookings.addAll(storage.findAllByItemIdAndStatusIn(
                                 item.getId(),
-                                List.of(Status.WAITING, Status.APPROVED),
-                                PageRequest.of(from,
-                                        size,
-                                        Sort.by("start").descending()))
+                                List.of(Status.WAITING, Status.APPROVED))
                         );
                     }
-                    return getDtoList(bookings);
+                    return getPagedDtoList(bookings, from, size);
                 case "waiting":
                     for (Item item : items) {
                         bookings.addAll(storage.findAllByItemIdAndStatus(item.getId(),
-                                Status.WAITING,
-                                PageRequest.of(from,
-                                        size,
-                                        Sort.by("start").descending())));
+                                Status.WAITING));
                     }
-                    return getDtoList(bookings);
+                    return getPagedDtoList(bookings, from, size);
                 default:
                     throw new BadRequestException(String.format("Unknown state: %s", state));
             }
@@ -231,16 +211,27 @@ public class DBBookingService implements BookingService {
         }
     }
 
-    private List<BookingDto> getDtoList(List<Booking> bookingList) {
-        List<BookingDto> dtoSet = new LinkedList<>();
-        for (Booking booking : bookingList) {
-            dtoSet.add(
-                    BookingDtoEntityMapper.getDtoFromEntity(
-                            booking,
-                            itemStorage.findById(booking.getItem().getId()).orElseThrow())
-            );
+    private PagedListHolder<BookingDto> getPagedDtoList(List<Booking> bookingList, int from, int size) {
+        try {
+            if (size < 1) throw new BadRequestException("Некорректные параметры страницы 'size': " + size);
+            if (from < 0) throw new BadRequestException("Некорректные параметры страницы 'from': " + from);
+            List<BookingDto> dtoList;
+
+            dtoList = bookingList.stream()
+                    .sorted(Comparator.comparing(Booking::getStart).reversed())
+                    .sorted(Comparator.comparing(Booking::getEnd).reversed())
+                    .map(booking -> BookingDtoEntityMapper.getDtoFromEntity(booking,
+                            itemStorage.findById(booking.getItem().getId()).orElseThrow()))
+                    .collect(Collectors.toCollection(LinkedList::new));
+
+            PagedListHolder<BookingDto> pageHolder = new PagedListHolder<>(dtoList);
+            pageHolder.setPage(from);
+            pageHolder.setMaxLinkedPages(size);
+            if (pageHolder.getPageSize() > size) pageHolder.setPageSize(size);
+            return pageHolder;
+        } catch (BadRequestException exception) {
+            throw new RuntimeException(exception);
         }
-        return dtoSet;
     }
 
     @Override
@@ -260,7 +251,7 @@ public class DBBookingService implements BookingService {
                     throw new NotFoundException("Эта заявка тебе не принадлежит");
                 }
             }
-            return BookingDtoEntityMapper.getDtoFromEntity(
+            return getDtoFromEntity(
                     booking,
                     item
             );
