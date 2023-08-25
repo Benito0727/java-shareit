@@ -24,7 +24,7 @@ class ItemInMemServiceImplTest {
     private InMemoryUserRepository userRepository;
 
     @BeforeEach
-    void SetUp() {
+    void setUp() {
         this.userRepository = new InMemoryUserRepository();
         this.itemRepository = new InMemoryItemRepository(userRepository);
         this.service = new ItemServiceImpl(userRepository, itemRepository);

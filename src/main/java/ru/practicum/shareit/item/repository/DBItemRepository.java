@@ -18,5 +18,6 @@ public interface DBItemRepository extends JpaRepository<Item, Long> {
     List<Item> findByOwnerId(Long id);
 
     List<Item> findItemsByOwnerId(Long id, Pageable pageable);
+
     Set<Item> findItemsByRequestId(Long id);
 }

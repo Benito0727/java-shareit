@@ -46,11 +46,11 @@ class ItemControllerTest {
                 .header("X-Sharer-User-Id", 1)
                 .content(ITEM_1_JSON);
 
-        RequestBuilder postRequestWithoutX_Sharer_User_Id = post("/items")
+        RequestBuilder postRequestWithoutXSharerUserId = post("/items")
                 .contentType(APPLICATION_JSON)
                 .content(ITEM_2_JSON);
 
-        mvc.perform(postRequestWithoutX_Sharer_User_Id)
+        mvc.perform(postRequestWithoutXSharerUserId)
                         .andExpect(status().is4xxClientError());
 
         mvc.perform(postRequest)

@@ -10,77 +10,77 @@ import java.time.LocalDateTime;
 
 public class TestUnits {
 
-    public final static String USER_1_JSON = "{\n" +
+    public static final String USER_1_JSON = "{\n" +
             "    \"name\": \"user\",\n" +
             "    \"email\": \"user@user.com\"\n" +
             "}";
 
-    public final static String USER_2_JSON = "{\n" +
+    public static final String USER_2_JSON = "{\n" +
             "    \"name\": \"user\",\n" +
             "    \"email\": \"other@user.com\"\n" +
             "}";
 
-    public final static String USER_3_JSON = "{\n" +
+    public static final String USER_3_JSON = "{\n" +
             "    \"name\": \"user\",\n" +
             "    \"email\": \"other@mail.com\"\n" +
             "}";
 
-    public final static String USER_JSON_INVALID_EMAIL = "{\n" +
+    public static final String USER_JSON_INVALID_EMAIL = "{\n" +
             "    \"name\": \"user\",\n" +
             "    \"email\": \"user.com\"\n" +
             "}";
 
-    public final static String USER_JSON_WITHOUT_EMAIL = "{\n" +
+    public static final String USER_JSON_WITHOUT_EMAIL = "{\n" +
             "    \"name\": \"user\"\n" +
             "}";
 
-    public final static String JSON_TO_UPDATE_USER = "{\n" +
+    public static final String JSON_TO_UPDATE_USER = "{\n" +
             "    \"name\": \"update\",\n" +
             "    \"email\": \"update@user.com\"\n" +
             "}";
 
-    public final static String JSON_TO_UPDATE_USER_ONLY_EMAIL = "{\n" +
+    public static final String JSON_TO_UPDATE_USER_ONLY_EMAIL = "{\n" +
             "    \"email\": \"updateName@user.com\"\n" +
             "}";
 
-    public final static String JSON_TO_UPDATE_USER_ONLY_NAME = "{\n" +
+    public static final String JSON_TO_UPDATE_USER_ONLY_NAME = "{\n" +
             "    \"name\": \"updateName\"\n" +
             "}";
 
-    public final static String ITEM_1_JSON = "{\n" +
+    public static final String ITEM_1_JSON = "{\n" +
             "    \"name\": \"Дрель\",\n" +
             "    \"description\": \"Простая дрель\",\n" +
             "    \"available\": true\n" +
             "}";
 
-    public final static String ITEM_2_JSON = "{\n" +
+    public static final String ITEM_2_JSON = "{\n" +
             "    \"name\": \"Отвертка\",\n" +
             "    \"description\": \"Аккумуляторная отвертка\",\n" +
             "    \"available\": true\n" +
             "}";
 
-    public final static String ITEM_3_JSON = "{\n" +
+    public static final String ITEM_3_JSON = "{\n" +
             "    \"name\": \"Клей Момент\",\n" +
             "    \"description\": \"Тюбик суперклея марки Момент\",\n" +
             "    \"available\": true\n" +
             "}";
 
-    public final static String JSON_TO_UPDATE_ITEM = "{\n" +
+    public static final String JSON_TO_UPDATE_ITEM = "{\n" +
             "    \"id\": 1,\n" +
             "    \"name\": \"Дрель+\",\n" +
             "    \"description\": \"Аккумуляторная дрель\",\n" +
             "    \"available\": false\n" +
             "}";
 
-    public final static String JSON_TO_UPDATE_ITEM_DESCRIPTION_ONLY = "{\n" +
+    public static final String JSON_TO_UPDATE_ITEM_DESCRIPTION_ONLY = "{\n" +
             "   \"description\": \"Аккумуляторная дрель + аккумулятор\"\n" +
             "}";
 
-    public final static String JSON_TO_UPDATE_ITEM_NAME_ONLY = "{\n" +
+    public static final String JSON_TO_UPDATE_ITEM_NAME_ONLY = "{\n" +
             "   \"name\": \"Аккумуляторная дрель\"\n" +
             "}";
 
-    public final static String JSON_TO_UPDATE_ITEM_AVAILABLE = "{\n" +
+    public static final String JSON_TO_UPDATE_ITEM_AVAILABLE = "{\n" +
             "    \"available\": true\n" +
             "}";
 

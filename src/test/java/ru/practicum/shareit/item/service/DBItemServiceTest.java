@@ -60,7 +60,7 @@ class DBItemServiceTest {
 
     @Test
     void getItemByIdOrThrowsException() {
-        assertThrows(RuntimeException.class, ()-> itemService.getItemById(1, 1));
+        assertThrows(RuntimeException.class, () -> itemService.getItemById(1, 1));
 
         userService.addUser(getUserDto());
 
