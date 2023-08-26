@@ -39,11 +39,4 @@ public class ErrorHandler {
         log.error(HttpStatus.CONFLICT.toString(), exception.getMessage());
         return new ErrorResponse(exception.getMessage(), HttpStatus.CONFLICT.toString());
     }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handelForbiddenException(@NotNull final  ForbiddenException exception) {
-        log.error(HttpStatus.FORBIDDEN.toString(), exception.getMessage());
-        return new ErrorResponse(exception.getMessage(), HttpStatus.FORBIDDEN.toString());
-    }
 }

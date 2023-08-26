@@ -7,6 +7,7 @@ import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.repository.InMemoryItemRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.InMemoryUserRepository;
 
 import java.util.List;
@@ -52,6 +53,9 @@ class ItemInMemServiceImplTest {
     @Test
     void updateItem() throws ConflictException, NotFoundException {
         userRepository.addUser(getUserEntity());
+        User user = getUserEntity();
+        user.setEmail("other@mail.com");
+        userRepository.addUser(user);
         service.createItem(1, getItemDto());
         ItemDto itemDto1 = getItemDto();
         itemDto1.setName(null);
@@ -66,6 +70,7 @@ class ItemInMemServiceImplTest {
 
 
         service.updateItem(1, 1, itemToUpdate);
+        assertThrows(RuntimeException.class, () -> service.updateItem(2, 1, itemToUpdate));
         assertEquals("update", itemRepository.getItemById(1, 1).getName());
         assertEquals("update", itemRepository.getItemById(1, 1).getDescription());
         assertFalse(itemRepository.getItemById(1, 1).getAvailable());
@@ -90,11 +95,14 @@ class ItemInMemServiceImplTest {
     @Test
     void removeItemById() throws ConflictException {
         userRepository.addUser(getUserEntity());
+        User user = getUserEntity();
+        user.setEmail("other@mail.com");
+        userRepository.addUser(user);
         service.createItem(1, getItemDto());
 
         assertThrows(RuntimeException.class, () -> service.removeItemById(9999, 1));
         assertThrows(RuntimeException.class, () -> service.removeItemById(1, 9999));
-
+        assertThrows(RuntimeException.class, () -> service.removeItemById(2, 1));
         service.removeItemById(1, 1);
 
         assertThrows(RuntimeException.class, () -> service.getItemById(1, 1));

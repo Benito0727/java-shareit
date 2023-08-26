@@ -77,18 +77,20 @@ public class ItemRequestDBService implements ItemRequestService {
     public Set<ItemRequestDto> getOtherUsersRequests(Long userId, Long from, Long size) {
         checkUser(userId);
         Set<ItemRequestDto> requestsDto = new LinkedHashSet<>();
-        if (from != null && size != null) {
-            for (ItemRequest itemRequest : storage.findAllByAuthorIdIsNot(userId,
-                    PageRequest.of(from.intValue(), size.intValue(), Sort.by("created").descending()))) {
-                ItemRequestDto requestDto = RequestEntityDtoMapper.getDtoFromEntity(itemRequest);
-                Set<Item> items = itemStorage.findItemsByRequestId(itemRequest.getId());
-                Set<ItemDtoToRequest> itemsDto = new LinkedHashSet<>();
-                for (Item item : items) {
-                    itemsDto.add(new ItemDtoToRequest(item));
-                }
-                requestDto.setItems(itemsDto);
-                requestsDto.add(requestDto);
+        if (from == null && size == null) {
+            from = 0L;
+            size = 10L;
+        }
+        for (ItemRequest itemRequest : storage.findAllByAuthorIdIsNot(userId,
+                PageRequest.of(from.intValue(), size.intValue(), Sort.by("created").descending()))) {
+            ItemRequestDto requestDto = RequestEntityDtoMapper.getDtoFromEntity(itemRequest);
+            Set<Item> items = itemStorage.findItemsByRequestId(itemRequest.getId());
+            Set<ItemDtoToRequest> itemsDto = new LinkedHashSet<>();
+            for (Item item : items) {
+                itemsDto.add(new ItemDtoToRequest(item));
             }
+            requestDto.setItems(itemsDto);
+            requestsDto.add(requestDto);
         }
         return new LinkedHashSet<>(requestsDto);
     }

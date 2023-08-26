@@ -46,30 +46,21 @@ public class DBItemService implements ItemService {
 
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) {
-        try {
-            User user = userStorage.findById(userId)
-                    .orElseThrow(
-                            () -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId))
-                    );
-            Item item = ItemEntityDtoMapper.getItemFromItemDto(itemDto);
-            item.setOwner(user);
+        User user = checkUser(userId);
+        Item item = ItemEntityDtoMapper.getItemFromItemDto(itemDto);
+        item.setOwner(user);
 
-            if (itemDto.getRequestId() != null) {
-                item.setRequestId(itemDto.getRequestId());
-            }
-
-            return ItemEntityDtoMapper.getItemDtoFromItem(storage.save(item));
-
-        } catch (NotFoundException exception) {
-            throw new RuntimeException(exception);
+        if (itemDto.getRequestId() != null) {
+            item.setRequestId(itemDto.getRequestId());
         }
+
+        return ItemEntityDtoMapper.getItemDtoFromItem(storage.save(item));
     }
 
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         try {
-            User user = userStorage.findById(userId)
-                    .orElseThrow(() -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId)));
+            User user = checkUser(userId);
             Item item = checkItem(itemId);
 
             if (item.getOwner() != user) {
@@ -81,7 +72,7 @@ public class DBItemService implements ItemService {
             if (itemDto.getAvailable() != null) item.setAvailable(itemDto.getAvailable());
 
             return ItemEntityDtoMapper.getItemDtoFromItem(storage.save(item));
-        } catch (NotFoundException | BadRequestException exception) {
+        } catch (BadRequestException exception) {
             throw new RuntimeException(exception);
         }
     }
@@ -89,6 +80,7 @@ public class DBItemService implements ItemService {
     @Override
     public ItemDto getItemById(long userId, long itemId) {
         Item item = checkItem(itemId);
+        checkUser(userId);
         ItemDto itemDto = ItemEntityDtoMapper.getItemDtoFromItem(item);
 
         if (item.getOwner().getId() == userId) {
@@ -103,6 +95,7 @@ public class DBItemService implements ItemService {
     @Override
     public void removeItemById(long userId, long itemId) {
         try {
+            checkUser(userId);
             Item item = checkItem(itemId);
             if (item.getOwner().getId() == userId) {
                 storage.delete(item);
@@ -117,6 +110,7 @@ public class DBItemService implements ItemService {
 
     @Override
     public List<ItemDto> getItemSet(long userId, Long from, Long size) {
+        checkUser(userId);
         List<Item> itemList = storage.findItemsByOwnerId(userId,
                 PageRequest.of(from.intValue(),
                         size.intValue(),
@@ -178,6 +172,7 @@ public class DBItemService implements ItemService {
 
     @Override
     public List<ItemDto> getItemsByText(long userId, String text, Long from, Long size) {
+        checkUser(userId);
         if (text.isEmpty()) return List.of();
         List<Item> itemList = storage.findByNameContainingOrDescriptionContainingIgnoreCase(text,
                 text,
@@ -200,6 +195,16 @@ public class DBItemService implements ItemService {
         try {
             return storage.findById(itemId).orElseThrow(
                     () -> new NotFoundException(String.format("Не нашли вещи с ID: %d", itemId))
+            );
+        } catch (NotFoundException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private User checkUser(Long userId) {
+        try {
+            return userStorage.findById(userId).orElseThrow(
+                    () -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId))
             );
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);

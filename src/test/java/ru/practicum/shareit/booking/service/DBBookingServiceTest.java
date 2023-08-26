@@ -96,6 +96,15 @@ class DBBookingServiceTest {
         bookingService.addBooking(2L, getBookingDto());
 
         assertNotNull(bookingService.findAllByUserId(2L, "all", 0, 10));
+        assertNotNull(bookingService.findAllByUserId(2L, "current", 0, 10));
+        assertTrue(bookingService.findAllByUserId(2L, "rejected", 0, 10).getSource().isEmpty());
+        assertTrue(bookingService.findAllByUserId(2L, "past", 0, 10).getSource().isEmpty());
+        assertEquals(2,
+                bookingService.findAllByUserId(2L, "waiting", 0, 10).getSource().size());
+        assertEquals(2,
+                bookingService.findAllByUserId(2L, "future", 0, 10).getSource().size());
+        assertThrows(RuntimeException.class, () ->
+                bookingService.findAllByUserId(2L, "asdf", 0, 10));
     }
 
     @Test
@@ -110,8 +119,61 @@ class DBBookingServiceTest {
         bookingService.addBooking(2L, getBookingDto());
         bookingService.addBooking(2L, getBookingDto());
 
-        assertFalse(bookingService.findBookingsToItemsOwner(1L, "all", 0, 10).getSource().isEmpty());
-        assertTrue(bookingService.findBookingsToItemsOwner(2L, "all", 0, 10).getSource().isEmpty());
+        assertFalse(bookingService.findBookingsToItemsOwner(
+                1L,
+                "all",
+                0,
+                10)
+                .getSource().isEmpty());
+        assertTrue(bookingService.findBookingsToItemsOwner(
+                2L,
+                "all",
+                0,
+                10)
+                .getSource().isEmpty());
+        assertTrue(bookingService.findBookingsToItemsOwner(
+                1L,
+                "current",
+                0,
+                10)
+                .getSource().isEmpty());
+
+        assertFalse(bookingService.findBookingsToItemsOwner(
+                1L,
+                "future",
+                0,
+                10)
+                .getSource().isEmpty());
+
+        assertEquals(2, bookingService.findBookingsToItemsOwner(
+                1L,
+                "waiting",
+                0,
+                10
+        ).getSource().size());
+
+        assertTrue(bookingService.findBookingsToItemsOwner(
+                1L,
+                "past",
+                0,
+                10
+        ).getSource().isEmpty());
+
+        assertTrue(bookingService.findBookingsToItemsOwner(
+                1L,
+                "rejected",
+                0,
+                10
+        ).getSource().isEmpty());
+
+        assertThrows(RuntimeException.class, () ->
+                bookingService.findBookingsToItemsOwner(
+                        1L,
+                        "asf",
+                        0,
+                        10
+                ));
+
     }
 
     @Test
