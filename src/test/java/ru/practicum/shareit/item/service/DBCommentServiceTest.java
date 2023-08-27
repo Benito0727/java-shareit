@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.DBBookingRepository;
 import ru.practicum.shareit.item.dto.comment.CommentDto;
 import ru.practicum.shareit.item.model.Comment;
@@ -53,9 +52,9 @@ class DBCommentServiceTest {
         booker.setId(2L);
         booker.setEmail("other@mail.com");
         userRepository.save(booker);
-        System.out.println(userRepository.findAll());
+
         Item item = itemRepository.save(getItemEntity(user));
-        Booking booking = bookingRepository.save(getBookingEntity(booker, item));
+        bookingRepository.save(getBookingEntity(booker, item));
 
         CommentDto commentDto = service.addComment(2L, 1L, getCommentDto());
 
