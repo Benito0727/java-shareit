@@ -66,7 +66,7 @@ class DBCommentServiceTest {
         assertEquals("Item", item1.getName());
         assertEquals("simple item", item1.getDescription());
 
-        CommentDto commentDto = service.addComment(2, 1, getCommentDto());
+        CommentDto commentDto = service.addComment(2L, 1L, getCommentDto());
 
         assertEquals("new comment", commentDto.getText());
         assertEquals(1, commentDto.getId());
