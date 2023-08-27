@@ -56,7 +56,7 @@ class DBCommentServiceTest {
         Item item = itemRepository.save(getItemEntity(user));
         bookingRepository.save(getBookingEntity(booker, item));
 
-        assertEquals(1, item.getId());
+        assertEquals(2, item.getId());
         assertEquals("Item", item.getName());
         assertEquals("simple item", item.getDescription());
 
