@@ -2,7 +2,12 @@ package ru.practicum.shareit.unit;
 
 import org.springframework.test.web.servlet.RequestBuilder;
 import ru.practicum.shareit.booking.dto.IncomingBookingDto;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.comment.IncomingCommentDto;
+import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.IncomingItemRequestDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -177,4 +182,42 @@ public class TestUnits {
                 .header("X-Sharer-User-Id", 1)
                 .content(ITEM_1_JSON);
     }
+
+    public static Comment getCommentEntity(Item item) {
+        Comment comment = new Comment();
+        comment.setCommentId(1L);
+        comment.setText("comment text");
+        comment.setAuthorName("user");
+        comment.setCreatedBy(LocalDateTime.now());
+        comment.setItem(item);
+        return comment;
+    }
+
+    public static IncomingCommentDto getCommentDto() {
+        IncomingCommentDto dto = new IncomingCommentDto();
+        dto.setText("new comment");
+        return dto;
+    }
+
+    public static Item getItemEntity(User user) {
+        Item item = new Item();
+        item.setId(1L);
+        item.setName("Item");
+        item.setDescription("simple item");
+        item.setAvailable(true);
+        item.setOwner(user);
+        return item;
+    }
+
+    public static Booking getBookingEntity(User booker, Item item) {
+        Booking booking = new Booking();
+        booking.setId(1L);
+        booking.setStart(LocalDateTime.now().minusMinutes(5));
+        booking.setEnd(LocalDateTime.now().minusMinutes(3));
+        booking.setStatus(Status.WAITING);
+        booking.setBooker(booker);
+        booking.setItem(item);
+        return booking;
+    }
+
 }
