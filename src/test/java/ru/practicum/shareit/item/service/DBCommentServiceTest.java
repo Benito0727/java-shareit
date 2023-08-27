@@ -54,10 +54,19 @@ class DBCommentServiceTest {
         userRepository.save(booker);
 
         Item item = itemRepository.save(getItemEntity(user));
-        item.setId(1L);
         bookingRepository.save(getBookingEntity(booker, item));
 
-        CommentDto commentDto = service.addComment(2L, 1L, getCommentDto());
+        assertEquals(1, item.getId());
+        assertEquals("Item", item.getName());
+        assertEquals("simple item", item.getDescription());
+
+        Item item1 = itemRepository.findById(1L).get();
+
+        assertEquals(1, item1.getId());
+        assertEquals("Item", item1.getName());
+        assertEquals("simple item", item1.getDescription());
+
+        CommentDto commentDto = service.addComment(2, 1, getCommentDto());
 
         assertEquals("new comment", commentDto.getText());
         assertEquals(1, commentDto.getId());

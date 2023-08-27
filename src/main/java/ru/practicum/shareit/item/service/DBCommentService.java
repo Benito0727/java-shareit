@@ -46,7 +46,7 @@ public class DBCommentService implements CommentService {
     }
 
     @Override
-    public CommentDto addComment(Long userId, Long itemId, IncomingCommentDto commentDto) {
+    public CommentDto addComment(long userId, long itemId, IncomingCommentDto commentDto) {
         try {
             User author = userStorage.findById(userId).orElseThrow(
                     () -> new NotFoundException(String.format("Не нашли пользователя с ID: %d", userId))
