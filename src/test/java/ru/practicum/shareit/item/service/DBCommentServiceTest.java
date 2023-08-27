@@ -2,87 +2,103 @@ package ru.practicum.shareit.item.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.DBBookingRepository;
 import ru.practicum.shareit.booking.service.DBBookingService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.comment.CommentDto;
+import ru.practicum.shareit.item.dto.comment.IncomingCommentDto;
 import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.DBCommentRepository;
 import ru.practicum.shareit.item.repository.DBItemRepository;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.DBUserRepository;
 import ru.practicum.shareit.user.service.DBUserService;
 
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static ru.practicum.shareit.unit.TestUnits.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class DBCommentServiceTest {
 
+    @InjectMocks
     private DBCommentService service;
 
-    @Autowired
+    @Mock
     private DBCommentRepository commentRepository;
 
-    @Autowired
+    @Mock
     private DBUserRepository userRepository;
 
-    @Autowired
+    @Mock
     private DBItemRepository itemRepository;
 
-    @Autowired
+    @Mock
     private DBBookingRepository bookingRepository;
-
-    @Autowired
-    private DBItemService itemService;
-
-    @Autowired
-    private DBUserService userService;
-
-    @Autowired
-    private DBBookingService bookingService;
-
-    @BeforeEach
-    void setUp() {
-        this.service = new DBCommentService(
-                userRepository,
-                bookingRepository,
-                itemRepository,
-                commentRepository
-        );
-    }
 
     @Test
     void addComment() {
-        UserDto user = getUserDto();
-        user.setId(1);
-        userService.addUser(user);
-        UserDto booker = getUserDto();
-        booker.setId(2);
-        booker.setEmail("other@mail.com");
-        userService.addUser(booker);
+        User user = new User(
+                2L,
+                "user",
+                "user@mail.com"
+        );
+        when(userRepository.findById(2L))
+                .thenReturn(Optional.of(user));
 
-        ItemDto item = itemService.createItem(1, getItemDto());
-        bookingService.addBooking(2L, getBookingDtoForComment());
+        Item item = new Item(
+                1L,
+                "item",
+                "description",
+                true);
 
-        assertEquals(1, item.getId());
-        assertEquals("item", item.getName());
-        assertEquals("item description", item.getDescription());
+        when(itemRepository.findById(1L))
+                .thenReturn(Optional.of(item));
 
-        CommentDto commentDto = service.addComment(2L, 1L, getCommentDto());
+        Booking booking = new Booking(
+                1L,
+                LocalDateTime.now().minusMinutes(2),
+                LocalDateTime.now().minusMinutes(1),
+                Status.APPROVED,
+                user,
+                item
+                );
 
-        assertEquals("new comment", commentDto.getText());
+        when(bookingRepository.findBookingsByItemIdAndBookerId(1L, 2L))
+                .thenReturn(List.of(booking));
+
+        when(commentRepository.save(any()))
+                .thenReturn(new Comment(
+                        1L,
+                        "text",
+                        "user",
+                        LocalDateTime.now(),
+                        item
+                ));
+
+        CommentDto commentDto = service.addComment(2, 1, getCommentDto());
+
         assertEquals(1, commentDto.getId());
+        assertEquals("text", commentDto.getText());
         assertEquals("user", commentDto.getAuthorName());
-
-        Comment comment = commentRepository.findById(1L).get();
-
-        assertEquals(1, comment.getCommentId());
-        assertEquals("new comment", comment.getText());
-        assertEquals(user.getName(), comment.getAuthorName());
     }
 }
