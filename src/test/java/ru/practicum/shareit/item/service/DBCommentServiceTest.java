@@ -6,13 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.repository.DBBookingRepository;
+import ru.practicum.shareit.booking.service.DBBookingService;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.comment.CommentDto;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.DBCommentRepository;
 import ru.practicum.shareit.item.repository.DBItemRepository;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.repository.DBUserRepository;
+import ru.practicum.shareit.user.service.DBUserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.practicum.shareit.unit.TestUnits.*;
@@ -35,6 +37,15 @@ class DBCommentServiceTest {
     @Autowired
     private DBBookingRepository bookingRepository;
 
+    @Autowired
+    private DBItemService itemService;
+
+    @Autowired
+    private DBUserService userService;
+
+    @Autowired
+    private DBBookingService bookingService;
+
     @BeforeEach
     void setUp() {
         this.service = new DBCommentService(
@@ -47,24 +58,18 @@ class DBCommentServiceTest {
 
     @Test
     void addComment() {
-        User user = userRepository.save(getUserEntity());
-        User booker = getUserEntity();
+        UserDto user = userService.addUser(getUserDto());
+        UserDto booker = getUserDto();
         booker.setId(2L);
         booker.setEmail("other@mail.com");
-        userRepository.save(booker);
+        userService.addUser(booker);
 
-        Item item = itemRepository.save(getItemEntity(user));
-        bookingRepository.save(getBookingEntity(booker, item));
+        ItemDto item = itemService.createItem(1, getItemDto());
+        bookingService.addBooking(2L, getBookingDtoForComment());
 
-        assertEquals(2, item.getId());
-        assertEquals("Item", item.getName());
-        assertEquals("simple item", item.getDescription());
-
-        Item item1 = itemRepository.findById(1L).get();
-
-        assertEquals(1, item1.getId());
-        assertEquals("Item", item1.getName());
-        assertEquals("simple item", item1.getDescription());
+        assertEquals(1, item.getId());
+        assertEquals("item", item.getName());
+        assertEquals("item description", item.getDescription());
 
         CommentDto commentDto = service.addComment(2L, 1L, getCommentDto());
 

@@ -144,6 +144,14 @@ public class TestUnits {
         return bookingDto;
     }
 
+    public static IncomingBookingDto getBookingDtoForComment() {
+        IncomingBookingDto dto = new IncomingBookingDto();
+        dto.setItemId(1L);
+        dto.setStart(LocalDateTime.now().minusMinutes(5));
+        dto.setEnd(LocalDateTime.now().minusMinutes(2));
+        return dto;
+    }
+
     public static IncomingItemRequestDto getItemRequestDto() {
         IncomingItemRequestDto itemRequest = new IncomingItemRequestDto();
         itemRequest.setDescription("description");
