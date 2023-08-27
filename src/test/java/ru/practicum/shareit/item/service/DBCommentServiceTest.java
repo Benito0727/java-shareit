@@ -58,9 +58,11 @@ class DBCommentServiceTest {
 
     @Test
     void addComment() {
-        UserDto user = userService.addUser(getUserDto());
+        UserDto user = getUserDto();
+        user.setId(1);
+        userService.addUser(user);
         UserDto booker = getUserDto();
-        booker.setId(2L);
+        booker.setId(2);
         booker.setEmail("other@mail.com");
         userService.addUser(booker);
 
