@@ -54,6 +54,7 @@ class DBCommentServiceTest {
         userRepository.save(booker);
 
         Item item = itemRepository.save(getItemEntity(user));
+        item.setId(1L);
         bookingRepository.save(getBookingEntity(booker, item));
 
         CommentDto commentDto = service.addComment(2L, 1L, getCommentDto());
