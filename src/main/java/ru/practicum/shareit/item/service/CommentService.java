@@ -5,5 +5,5 @@ import ru.practicum.shareit.item.dto.comment.IncomingCommentDto;
 
 public interface CommentService {
 
-    CommentDto addComment(Long userId, Long itemId, IncomingCommentDto commentDto);
+    CommentDto addComment(long userId, long itemId, IncomingCommentDto commentDto);
 }

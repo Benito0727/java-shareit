@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
@@ -14,12 +13,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service("UserService")
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
     private final InMemoryUserRepository storage;
 
+    @Autowired
+    public UserServiceImpl(InMemoryUserRepository storage) {
+        this.storage = storage;
+    }
 
     public UserDto addUser(UserDto userDto) {
         try {
