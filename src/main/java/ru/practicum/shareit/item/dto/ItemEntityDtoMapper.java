@@ -20,4 +20,14 @@ public class ItemEntityDtoMapper {
         itemDto.setRequestId(item.getRequestId());
         return itemDto;
     }
+
+    public static ItemDtoToRequest getItemDtoToRequest(Item item) {
+        ItemDtoToRequest dto = new ItemDtoToRequest();
+        dto.setId(item.getId());
+        dto.setName(item.getName());
+        dto.setDescription(item.getDescription());
+        dto.setRequestId(item.getRequestId());
+        dto.setAvailable(item.getAvailable());
+        return dto;
+    }
 }

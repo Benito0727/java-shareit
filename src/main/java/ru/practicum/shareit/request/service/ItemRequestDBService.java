@@ -16,11 +16,13 @@ import ru.practicum.shareit.request.repository.ItemRequestDBRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.DBUserRepository;
 
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.item.dto.ItemEntityDtoMapper.getItemDtoToRequest;
+import static ru.practicum.shareit.request.dto.mapper.RequestEntityDtoMapper.getEntityFromIncomingDto;
 
 @Service
 public class ItemRequestDBService implements ItemRequestService {
@@ -45,7 +47,7 @@ public class ItemRequestDBService implements ItemRequestService {
         Set<Item> items = itemStorage.findItemsByRequestId(requestId);
         Set<ItemDtoToRequest> itemsDto = new LinkedHashSet<>();
         for (Item item : items) {
-            itemsDto.add(new ItemDtoToRequest(item));
+            itemsDto.add(getItemDtoToRequest(item));
         }
 
         requestDto.setItems(itemsDto);
@@ -61,7 +63,7 @@ public class ItemRequestDBService implements ItemRequestService {
             Set<Item> items = itemStorage.findItemsByRequestId(request.getId());
             Set<ItemDtoToRequest> itemsDto = new LinkedHashSet<>();
             for (Item item : items) {
-                itemsDto.add(new ItemDtoToRequest(item));
+                itemsDto.add(getItemDtoToRequest(item));
             }
             ItemRequestDto requestDto = RequestEntityDtoMapper.getDtoFromEntity(request);
 
@@ -87,7 +89,7 @@ public class ItemRequestDBService implements ItemRequestService {
             Set<Item> items = itemStorage.findItemsByRequestId(itemRequest.getId());
             Set<ItemDtoToRequest> itemsDto = new LinkedHashSet<>();
             for (Item item : items) {
-                itemsDto.add(new ItemDtoToRequest(item));
+                itemsDto.add(getItemDtoToRequest(item));
             }
             requestDto.setItems(itemsDto);
             requestsDto.add(requestDto);
@@ -98,10 +100,7 @@ public class ItemRequestDBService implements ItemRequestService {
     @Override
     public ItemRequestDto addRequest(Long userId, IncomingItemRequestDto incomingItemRequest) {
         User author = checkUser(userId);
-        ItemRequest itemRequest = new ItemRequest();
-        itemRequest.setDescription(incomingItemRequest.getDescription());
-        itemRequest.setAuthor(author);
-        itemRequest.setCreated(LocalDateTime.now());
+        ItemRequest itemRequest = getEntityFromIncomingDto(incomingItemRequest, author);
         return RequestEntityDtoMapper.getDtoFromEntity(storage.save(itemRequest));
     }
 
