@@ -18,30 +18,4 @@ public class UserController {
     public UserController(DBUserService service) {
         this.service = service;
     }
-
-    @PostMapping
-    public UserDto addUser(@RequestBody @Valid UserDto userDto) {
-        return service.addUser(userDto);
-    }
-
-    @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable(value = "userId") long id,
-                           @RequestBody UserDto userDto) {
-        return service.updateUser(id, userDto);
-    }
-
-    @GetMapping("/{userId}")
-    public UserDto getUserById(@PathVariable(value = "userId") long id) {
-        return service.getUserById(id);
-    }
-
-    @DeleteMapping("/{userId}")
-    public void removeUser(@PathVariable(value = "userId") long id) {
-        service.removeUser(id);
-    }
-
-    @GetMapping
-    public List<UserDto> getAllUsers() {
-        return service.getAllUsers();
-    }
 }
