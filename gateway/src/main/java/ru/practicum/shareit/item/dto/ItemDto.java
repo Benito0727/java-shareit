@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -14,13 +13,13 @@ import javax.validation.constraints.NotNull;
 public class ItemDto {
 
     @NotBlank
-    @Max(64)
     private String name;
 
     @NotBlank
-    @Max(255)
     private String description;
 
     @NotNull
     private Boolean available;
+
+    private Long requestId;
 }

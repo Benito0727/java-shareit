@@ -73,7 +73,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> getItemByText(@RequestHeader(X_SHARER_USER_ID) long userId,
-                                                @RequestParam String text,
+                                                @RequestParam(value = "text") String text,
                                                 @RequestParam(value = "state", defaultValue = "all") String stringState,
                                                 @RequestParam(value = "from", defaultValue = "0") Integer from,
                                                 @RequestParam(value = "size", defaultValue = "10") Integer size) {
@@ -83,7 +83,7 @@ public class ItemController {
         return client.getItemsByText(userId, text, getStateFromString(stringState), from, size);
     }
 
-    @PostMapping("/{itemId}/comments")
+    @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> addComment(@RequestHeader(X_SHARER_USER_ID) long userId,
                                              @PathVariable("itemId") long itemId,
                                              @RequestBody @Valid CommentDto dto) {

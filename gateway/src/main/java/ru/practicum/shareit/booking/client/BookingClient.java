@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.client;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -13,6 +12,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.State;
 import ru.practicum.shareit.client.BaseClient;
 
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 @Service
@@ -60,6 +60,6 @@ public class BookingClient extends BaseClient {
         Map<java.lang.String, Object> parameter = Map.of(
                 "approved", isApproved
         );
-        return patch("/" + bookingId, userId, parameter);
+        return patch("/" + bookingId + "?approved={approved}", userId, parameter);
     }
 }

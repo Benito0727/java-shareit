@@ -35,7 +35,7 @@ public class ItemClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return get("", userId, parameter);
+        return get("?state={state}&from={from}&size={size}", userId, parameter);
     }
 
     public ResponseEntity<Object> getItemById(long userId, long itemId) {
@@ -61,7 +61,7 @@ public class ItemClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return get("/search", userId, parameter);
+        return get("/search?text={text}&state={state}&from={from}&size={size}", userId, parameter);
     }
 
     public ResponseEntity<Object> addComment(long userId, long itemId, CommentDto dto) {

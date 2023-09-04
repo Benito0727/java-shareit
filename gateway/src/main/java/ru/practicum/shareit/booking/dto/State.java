@@ -7,13 +7,14 @@ public enum State {
     ALL,
     FUTURE,
     CURRENT,
+    WAITING,
     PAST,
     CANCELED,
     REJECTED;
 
     public static Optional<State> getStateFrom(java.lang.String stringStatus) {
         return Arrays.stream(State.values())
-                .filter(status -> status.toString().equals(stringStatus))
+                .filter(status -> status.toString().equals(stringStatus.toUpperCase()))
                 .findAny();
     }
 }

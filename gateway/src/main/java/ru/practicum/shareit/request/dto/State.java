@@ -7,6 +7,8 @@ public enum State {
     ALL;
 
     public static Optional<State> getStateFrom(String stringState) {
-        return Arrays.stream(State.values()).filter(state -> state.name().equals(stringState)).findAny();
+        return Arrays.stream(State.values())
+                .filter(state -> state.name().equals(stringState.toUpperCase()))
+                .findAny();
     }
 }

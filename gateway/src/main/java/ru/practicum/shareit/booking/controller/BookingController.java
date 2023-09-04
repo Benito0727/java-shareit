@@ -12,8 +12,6 @@ import ru.practicum.shareit.booking.dto.State;
 import ru.practicum.shareit.exception.BadRequestException;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 
 @RestController
 @RequestMapping("/bookings")
@@ -33,8 +31,8 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<Object> getAllBookings(@RequestHeader(X_SHARER_USER_ID) long userId,
             @RequestParam(name = "state", defaultValue = "all") String stringState,
-            @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") Integer size,
-            @Positive @RequestParam(value = "from", defaultValue = "0") Integer from) {
+            @RequestParam(value = "size", defaultValue = "10") Integer size,
+            @RequestParam(value = "from", defaultValue = "0") Integer from) {
 
         log.info("Запрашиваем букинги с state={}, userID={}, from={}, size={}",
                 stringState, userId, from, size);
@@ -78,7 +76,7 @@ public class BookingController {
     private State getStateFromString(String stringState) {
         try {
             return State.getStateFrom(stringState)
-                    .orElseThrow(() -> new BadRequestException("Unknown state :" + stringState));
+                    .orElseThrow(() -> new BadRequestException("Unknown state: " + stringState));
         } catch (BadRequestException exception) {
             throw new RuntimeException(exception);
         }
