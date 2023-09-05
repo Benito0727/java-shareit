@@ -10,7 +10,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.DBBookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.booking.dto.IncomingBookingDto;
 import ru.practicum.shareit.booking.model.Status;
@@ -47,12 +46,6 @@ public class DBBookingService implements BookingService {
         try {
             User user = checkUser(userId);
             Booking booking = BookingDtoEntityMapper.getEntityFromIncomingDto(dto);
-            if (booking.getStart().isAfter(booking.getEnd()) ||
-                booking.getStart().equals(booking.getEnd()) ||
-                booking.getStart().isBefore(LocalDateTime.now())) {
-                throw new ValidationException("Дата старта должна быть в будущем" +
-                        " и дата окончания должна быть позже даты старта");
-            }
             Item item = itemStorage.findById(dto.getItemId())
                             .orElseThrow(
                             () -> new NotFoundException(
@@ -70,7 +63,7 @@ public class DBBookingService implements BookingService {
             } else {
                 throw new BadRequestException(String.format("Вещь с ID: %d недоступна", item.getId()));
             }
-        } catch (ValidationException | NotFoundException | BadRequestException exception) {
+        } catch (NotFoundException | BadRequestException exception) {
             throw new RuntimeException(exception);
         }
     }

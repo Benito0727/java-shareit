@@ -22,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.booking.dto.BookingDtoEntityMapper.getBookingDtoToItem;
+
 @Service
 public class DBItemService implements ItemService {
 
@@ -135,13 +137,13 @@ public class DBItemService implements ItemService {
         ItemDto itemDto = ItemEntityDtoMapper.getItemDtoFromItem(item);
         BookingDtoToItem bookingDtoToItem;
         if (item.getLastBooking() != null) {
-            bookingDtoToItem = new BookingDtoToItem(
+            bookingDtoToItem = getBookingDtoToItem(
                     bookingService.findByBookingId(item.getOwner().getId(), item.getLastBooking())
             );
             itemDto.setLastBooking(bookingDtoToItem);
         }
         if (item.getNextBooking() != null) {
-            bookingDtoToItem = new BookingDtoToItem(
+            bookingDtoToItem = getBookingDtoToItem(
                     bookingService.findByBookingId(item.getOwner().getId(), item.getNextBooking())
             );
             itemDto.setNextBooking(bookingDtoToItem);

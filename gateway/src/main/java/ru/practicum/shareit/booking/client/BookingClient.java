@@ -11,8 +11,10 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.State;
 import ru.practicum.shareit.client.BaseClient;
+import ru.practicum.shareit.exception.ValidationException;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
@@ -49,6 +51,7 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> addBooking(long userId, BookingDto dto) {
+        validateBookingDto(dto);
         return post("", userId, dto);
     }
 
@@ -61,5 +64,21 @@ public class BookingClient extends BaseClient {
                 "approved", isApproved
         );
         return patch("/" + bookingId + "?approved={approved}", userId, parameter);
+    }
+
+    private void validateBookingDto(BookingDto dto) {
+        try {
+            if (dto.getStart().isAfter(dto.getEnd())) {
+                throw new ValidationException("Дата и время старта должны быть раньше даты и времени окончания");
+            }
+            if (dto.getStart().equals(dto.getEnd())) {
+                throw new ValidationException("Дата и время старта и окончания должны отличаться");
+            }
+            if (dto.getStart().isBefore(LocalDateTime.now())) {
+                throw new ValidationException("Дата и время старта должны бють в будущем");
+            }
+        } catch (ValidationException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 }

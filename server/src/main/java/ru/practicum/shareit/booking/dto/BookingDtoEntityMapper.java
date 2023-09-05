@@ -20,4 +20,9 @@ public class BookingDtoEntityMapper {
                 item.getName()
         );
     }
+
+    public static BookingDtoToItem getBookingDtoToItem(BookingDto bookingDto) {
+        return new BookingDtoToItem(bookingDto.getId(),
+                                    bookingDto.getBooker().getId());
+    }
 }
