@@ -1,2 +1,2 @@
 # java-shareit
-Template repository for Shareit project.
+Итоговый проект модуля в рамках обучения Яндекс.Практикум
